@@ -1,10 +1,10 @@
-<h1>Voting</h1>
+#Voting
 
 Done by Anirudh Venkatesh
 
 Solidity version: 0.8.14
 
-<h2>Improvement:</h2>
+##Improvements:
 
 **Introduced a voting deadline**. The deadline is set during the contract deployment using a votingDurationInSeconds parameter (which specifies how long the voting period will last). There is a hasNotEnded modifier which checks that the current time (block.timestamp) is before the deadline before allowing certain functions to execute.
 
