@@ -48,6 +48,7 @@ contract Ballot {
 
     // Give voter the right to vote on this ballot.
     // May only be called by chairperson.
+	/**
     function giveRightToVote(address voter) external {
         // If the first argument of require evaluates
         // to false, execution terminates and all
@@ -70,6 +71,20 @@ contract Ballot {
         require(voters[voter].weight == 0);
         voters[voter].weight = 1;
     }
+	*/
+	
+	// Allow the chairperson to give right to vote to multiple voters at once
+	function giveRightsToMultipleVoters(address[] calldata votersList) external {
+		require(msg.sender == chairperson, "Only chairperson can give right to vote.");
+    
+		for (uint i = 0; i < votersList.length; i++) {
+			address voter = votersList[i];
+			require(!voters[voter].voted, "The voter already voted.");
+			require(voters[voter].weight == 0, "The voter already has voting rights.");
+			voters[voter].weight = 1;
+		}
+	}
+
 
     /// Delegate your vote to the voter to.
     function delegate(address to) external {
@@ -133,6 +148,7 @@ contract Ballot {
 
     /// @dev Computes the winning proposal taking all
     /// previous votes into account.
+	/**
     function winningProposal() public view
             returns (uint winningProposal_)
     {
@@ -144,6 +160,40 @@ contract Ballot {
             }
         }
     }
+	*/
+	
+	// Modified function to handle ties by returning a random winning proposal among tied ones
+	function winningProposals() public view
+			returns (uint winningProposal_)
+	{
+    uint winningVoteCount = 0;
+
+    // First, find the highest vote count
+    for (uint p = 0; p < proposals.length; p++) {
+        if (proposals[p].voteCount > winningVoteCount) {
+            winningVoteCount = proposals[p].voteCount;
+        }
+    }
+
+    // Second, collect all proposals with the highest vote count
+    uint[] memory tiedProposals = new uint[](proposals.length);
+    uint count = 0;
+    for (uint p = 0; p < proposals.length; p++) {
+        if (proposals[p].voteCount == winningVoteCount) {
+            tiedProposals[count] = p;
+            count++;
+        }
+    }
+
+    // If there is more than one tied proposal, select a random one
+    if (count > 1) {
+        uint randomIndex = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % count;
+        winningProposal_ = tiedProposals[randomIndex];
+    } else {
+        // No tie, just return the single winner
+        winningProposal_ = tiedProposals[0];
+    }
+	}
 
     // Calls winningProposal() function to get the index
     // of the winner contained in the proposals array and then
