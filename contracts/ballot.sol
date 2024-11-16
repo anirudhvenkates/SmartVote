@@ -20,6 +20,7 @@ contract Ballot {
 
     address public chairperson;
     uint public deadline; // The deadline for voting (unix timestamp)
+	uint public constant MAX_DELEGATION_DEPTH = 5;
 
     // This declares a state variable that
     // stores a Voter struct for each possible address.
@@ -66,30 +67,32 @@ contract Ballot {
         }
     }
 
-    // Delegate your vote to another voter
     function delegate(address to) external hasNotEnded {
-        Voter storage sender = voters[msg.sender];
-        require(sender.weight != 0, "You have no right to vote");
-        require(!sender.voted, "You already voted.");
-        require(to != msg.sender, "Self-delegation is disallowed.");
+		Voter storage sender = voters[msg.sender];
+		require(sender.weight != 0, "You have no right to vote");
+		require(!sender.voted, "You already voted.");
+		require(to != msg.sender, "Self-delegation is disallowed.");
 
-        while (voters[to].delegate != address(0)) {
-            to = voters[to].delegate;
-            require(to != msg.sender, "Found loop in delegation.");
-        }
+		uint delegationDepth = 0;
+		while (voters[to].delegate != address(0)) {
+			to = voters[to].delegate;
+			delegationDepth++;
+			require(delegationDepth <= MAX_DELEGATION_DEPTH, "Delegation chain too deep");
+			require(to != msg.sender, "Found loop in delegation.");
+		}
 
-        Voter storage delegate_ = voters[to];
-        require(delegate_.weight >= 1, "Delegate cannot vote");
+		Voter storage delegate_ = voters[to];
+		require(delegate_.weight >= 1, "Delegate cannot vote");
 
-        sender.voted = true;
-        sender.delegate = to;
+		sender.voted = true;
+		sender.delegate = to;
 
-        if (delegate_.voted) {
-            proposals[delegate_.vote].voteCount += sender.weight;
-        } else {
-            delegate_.weight += sender.weight;
-        }
-    }
+		if (delegate_.voted) {
+			proposals[delegate_.vote].voteCount += sender.weight;
+		} else {
+			delegate_.weight += sender.weight;
+		}
+	}
 
     // Cast a vote for a proposal
     function vote(uint proposal) external hasNotEnded {
