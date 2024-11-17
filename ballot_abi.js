@@ -51,7 +51,7 @@ var ballotABI = [
   },
   {
     "inputs": [],
-    "name": "winningProposal",
+    "name": "winningProposals",
     "outputs": [
       {
         "internalType": "uint256",
