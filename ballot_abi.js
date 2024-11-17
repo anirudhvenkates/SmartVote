@@ -11,17 +11,17 @@ var ballotABI = [
     "type": "constructor"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "voter",
-        "type": "address"
-      }
-    ],
-    "name": "giveRightToVote",
-    "outputs": [],
-    "stateMutability": "external",
-    "type": "function"
+	"inputs": [
+	{
+      "internalType": "address[]",
+      "name": "votersList",
+      "type": "address[]"
+    }
+  ],
+  "name": "giveRightsToMultipleVoters",
+  "outputs": [],
+  "stateMutability": "external",
+  "type": "function"
   },
   {
     "inputs": [
