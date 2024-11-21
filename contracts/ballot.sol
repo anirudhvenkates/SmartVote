@@ -2,12 +2,10 @@
 pragma solidity ^0.8.14;
 
 contract Ballot {
-    // This declares a new complex type which will
-    // be used for variables later.
-    // It will represent a single voter.
+    // This declares a new complex type which will represent a single voter.
     struct Voter {
-        uint weight; // weight is accumulated by delegation
-        bool voted;  // if true, that person already voted
+        uint weight; // weight accumulated by delegation
+        bool voted;  // true if the person has already voted
         address delegate; // person delegated to
         uint vote;   // index of the voted proposal
     }
@@ -19,28 +17,24 @@ contract Ballot {
     }
 
     address public chairperson;
-    uint public deadline; // The deadline for voting (unix timestamp)
-	uint public constant MAX_DELEGATION_DEPTH = 5;
+    uint public deadline; // The deadline for voting (Unix timestamp)
+    uint public constant MAX_DELEGATION_DEPTH = 5;
 
-    // This declares a state variable that
-    // stores a Voter struct for each possible address.
+    // Mapping from address to Voter struct
     mapping(address => Voter) public voters;
 
-    // A dynamically-sized array of Proposal structs.
+    // Array to hold proposals
     Proposal[] public proposals;
 
-    /// Create a new ballot to choose one of proposalNames.
-    /// The chairperson can also set a deadline (in Unix timestamp).
+    // Create a new ballot to choose one of proposalNames
     constructor(bytes32[] memory proposalNames, uint votingDurationInSeconds) {
         chairperson = msg.sender;
         voters[chairperson].weight = 1;
-        
+
         // Set the voting deadline
         deadline = block.timestamp + votingDurationInSeconds;
 
-        // For each of the provided proposal names,
-        // create a new proposal object and add it
-        // to the end of the array.
+        // Create proposals from the provided names
         for (uint i = 0; i < proposalNames.length; i++) {
             proposals.push(Proposal({
                 name: proposalNames[i],
@@ -54,6 +48,10 @@ contract Ballot {
         require(block.timestamp <= deadline, "Voting period has ended.");
         _;
     }
+	
+	function proposalsLength() external view returns (uint) {
+		return proposals.length;
+	}
 
     // Allow the chairperson to give right to vote to multiple voters at once
     function giveRightsToMultipleVoters(address[] calldata votersList) external {
@@ -66,36 +64,46 @@ contract Ballot {
             voters[voter].weight = 1;
         }
     }
-
-    function delegate(address to) external hasNotEnded {
-		Voter storage sender = voters[msg.sender];
-		require(sender.weight != 0, "You have no right to vote");
-		require(!sender.voted, "You already voted.");
-		require(to != msg.sender, "Self-delegation is disallowed.");
-
-		uint delegationDepth = 0;
-		while (voters[to].delegate != address(0)) {
-			to = voters[to].delegate;
-			delegationDepth++;
-			require(delegationDepth <= MAX_DELEGATION_DEPTH, "Delegation chain too deep");
-			require(to != msg.sender, "Found loop in delegation.");
-		}
-
-		Voter storage delegate_ = voters[to];
-		require(delegate_.weight >= 1, "Delegate cannot vote");
-
-		sender.voted = true;
-		sender.delegate = to;
-
-		if (delegate_.voted) {
-			proposals[delegate_.vote].voteCount += sender.weight;
-		} else {
-			delegate_.weight += sender.weight;
+	
+	function revokeVotingRights(address[] calldata votersList) external {
+		require(msg.sender == chairperson, "Only chairperson can revoke rights.");
+		for (uint i = 0; i < votersList.length; i++) {
+			address voter = votersList[i];
+			require(voters[voter].weight == 1, "The voter does not have voting rights.");
+			voters[voter].weight = 0;
 		}
 	}
 
+    // Delegate vote to another voter
+    function delegate(address to) external hasNotEnded {
+        Voter storage sender = voters[msg.sender];
+        require(sender.weight != 0, "You have no right to vote");
+        require(!sender.voted, "You already voted.");
+        require(to != msg.sender, "Self-delegation is disallowed.");
+
+        uint delegationDepth = 0;
+        while (voters[to].delegate != address(0)) {
+            to = voters[to].delegate;
+            delegationDepth++;
+            require(delegationDepth <= MAX_DELEGATION_DEPTH, "Delegation chain too deep");
+            require(to != msg.sender, "Found loop in delegation.");
+        }
+
+        Voter storage delegate_ = voters[to];
+        require(delegate_.weight >= 1, "Delegate cannot vote");
+
+        sender.voted = true;
+        sender.delegate = to;
+
+        if (delegate_.voted) {
+            proposals[delegate_.vote].voteCount += sender.weight;
+        } else {
+            delegate_.weight += sender.weight;
+        }
+    }
+
     // Cast a vote for a proposal
-    function vote(uint proposal) external hasNotEnded {
+    function voteForProposal(uint proposal) external hasNotEnded {
         Voter storage sender = voters[msg.sender];
         require(sender.weight != 0, "Has no right to vote");
         require(!sender.voted, "Already voted.");
@@ -105,7 +113,7 @@ contract Ballot {
         proposals[proposal].voteCount += sender.weight;
     }
 
-    // Get the index of the winning proposal, accounting for ties
+    // Get the index of the winning proposal
     function winningProposals() public view returns (uint winningProposal_) {
         uint winningVoteCount = 0;
         for (uint p = 0; p < proposals.length; p++) {
