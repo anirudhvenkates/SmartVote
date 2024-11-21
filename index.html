@@ -19,6 +19,13 @@
       <button onclick="vote(1)">Vote for Proposal 2</button>
       <button onclick="vote(2)">Vote for Proposal 3</button>
     </div>
+	
+	<h1>Declare Winner</h1>
+	<div>
+        <h3>Grant Voting Rights</h3>
+        <!--textarea id="votersList" placeholder="Enter addresses separated by commas"></textarea><br><br-->
+        <button onclick="getWinnerName()">Get Winner Name</button>
+    </div>
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
@@ -58,6 +65,17 @@
 	  alert("There was an error while casting your vote.");
 	  }
 	  }
+	  
+	  // Function to get the winner's name
+      async function getWinnerName() {
+        try {
+          const winner = await ballotContract.methods.winnerName().call(); // Use call() for view function
+          alert("The winner is: " + web3.utils.hexToUtf8(winner)); // Convert bytes32 to string
+        } catch (error) {
+          console.error("Error fetching winner: ", error);
+          alert("There was an error while fetching winner.");
+        }
+      }
     </script>
   </body>
 </html>
