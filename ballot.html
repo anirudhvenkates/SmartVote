@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chairperson Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script src="ballot_abi.js"></script>
+  </head>
+  <body>
+    <h1>Chairperson Dashboard</h1>
+	<!-- Section to change the voting duration -->
+    <div>
+      <h3>Initialize Ballot</h3>
+      <input type="number" id="votingDuration" placeholder="Enter duration in seconds" /><br><br>
+      <textarea id="proposalNames" placeholder="Enter proposal names separated by commas"></textarea><br><br>
+      <button onclick="initializeBallot()">Initialize Ballot</button>
+    </div>
+
+    <!-- Section to grant voting rights -->
+    <div>
+      <h3>Grant Voting Rights</h3>
+      <textarea id="votersList" placeholder="Enter addresses separated by commas"></textarea><br><br>
+      <button onclick="grantVotingRights()">Grant Voting Rights</button>
+    </div>
+
+    <!-- Section to revoke voting rights -->
+    <div>
+      <h3>Revoke Voting Rights</h3>
+      <textarea id="revokeVotersList" placeholder="Enter addresses separated by commas"></textarea><br><br>
+      <button onclick="revokeVotingRights()">Revoke Voting Rights</button>
+    </div>
+
+    <!-- Section to declare the winner -->
+    <div>
+      <h3>Declare Winner</h3>
+      <button onclick="getWinnerName()">Get Winner Name</button>
+    </div>
+
+    <script>
+      const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
+      const contractAddress = "0xC5Ed0b582c812c81A915044782E50470C2AEf2b2"; // Replace with your deployed contract address
+      const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
+
+      async function grantVotingRights() {
+        try {
+          const accounts = await web3.eth.requestAccounts();
+          const chairpersonAddress = accounts[0];
+          const votersAddresses = document.getElementById('votersList').value.split(',');
+
+          await ballotContract.methods.giveRightsToMultipleVoters(votersAddresses).send({ from: chairpersonAddress });
+          alert("Voting rights granted!");
+        } catch (error) {
+          console.error("Error granting voting rights: ", error);
+          alert("There was an error while granting voting rights.");
+        }
+      }
+
+      async function revokeVotingRights() {
+        try {
+          const accounts = await web3.eth.requestAccounts();
+          const chairpersonAddress = accounts[0];
+          const votersAddresses = document.getElementById('revokeVotersList').value.split(',');
+
+          await ballotContract.methods.revokeVotingRights(votersAddresses).send({ from: chairpersonAddress });
+          alert("Voting rights revoked!");
+        } catch (error) {
+          console.error("Error revoking voting rights: ", error);
+          alert("There was an error while revoking voting rights.");
+        }
+      }
+
+      async function getWinnerName() {
+        try {
+          const winner = await ballotContract.methods.winnerName().call();
+          alert("The winner is: " + web3.utils.hexToUtf8(winner));
+        } catch (error) {
+          console.error("Error fetching winner: ", error);
+          alert("There was an error while fetching winner.");
+        }
+      }
+	  
+	  async function initializeBallot() {
+        try {
+          const accounts = await web3.eth.requestAccounts();
+          const chairpersonAddress = accounts[0];
+
+          // Get the proposal names from the input field
+          const proposalNamesInput = document.getElementById('proposalNames').value;
+          if (!proposalNamesInput) {
+            alert("Please enter proposal names.");
+            return;
+          }
+          const proposalNames = proposalNamesInput.split(',').map(name => web3.utils.asciiToHex(name.trim()));
+
+          // Get the voting duration from the input field
+          const votingDurationInSeconds = parseInt(document.getElementById('votingDuration').value);
+          if (isNaN(votingDurationInSeconds) || votingDurationInSeconds <= 0) {
+            alert("Please enter a valid voting duration.");
+            return;
+          }
+
+          await ballotContract.methods.initializeBallot(proposalNames, votingDurationInSeconds).send({ from: chairpersonAddress });
+          alert("Ballot initialized with proposals and voting duration!");
+        } catch (error) {
+          console.error("Error initializing ballot: ", error);
+          alert("There was an error initializing the ballot.");
+        }
+      }
+
+    </script>
+  </body>
+</html>

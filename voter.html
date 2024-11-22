@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Voter Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script src="vote_abi.js"></script>
+  </head>
+  <body>
+    <h1>Voter Dashboard</h1>
+
+    <!-- Section to display available proposals -->
+    <div>
+      <h3>Vote for a Proposal</h3>
+      <button onclick="vote(0)">Vote for Proposal 1</button>
+      <button onclick="vote(1)">Vote for Proposal 2</button>
+      <button onclick="vote(2)">Vote for Proposal 3</button>
+    </div>
+
+    <!-- Section to delegate vote -->
+    <div>
+      <h3>Delegate Your Vote</h3>
+      <input type="text" id="delegateTo" placeholder="Enter address to delegate to" /><br><br>
+      <button onclick="delegateVote()">Delegate Vote</button>
+    </div>
+
+    <!-- Section to view remaining time -->
+    <div>
+      <h3>Voting Time Remaining</h3>
+      <p id="remainingTime">Click to load remaining time...</p>
+      <button onclick="updateRemainingTime()">Check Remaining Time</button>
+    </div>
+
+    <script>
+      const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
+      const contractAddress = "0xC5Ed0b582c812c81A915044782E50470C2AEf2b2"; // Replace with your deployed contract address
+      const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
+
+      async function vote(proposalIndex) {
+        try {
+          const accounts = await web3.eth.requestAccounts();
+          const account = accounts[0];
+
+          await ballotContract.methods.vote(proposalIndex).send({ from: account });
+          alert("Vote has been cast!");
+        } catch (error) {
+          console.error("Error casting vote: ", error);
+          alert("There was an error while casting your vote.");
+        }
+      }
+
+      async function delegateVote() {
+        try {
+          const accounts = await web3.eth.requestAccounts();
+          const account = accounts[0];
+          const delegateToAddress = document.getElementById("delegateTo").value;
+
+          if (!web3.utils.isAddress(delegateToAddress)) {
+            alert("Please enter a valid Ethereum address.");
+            return;
+          }
+
+          await ballotContract.methods.delegate(delegateToAddress).send({ from: account });
+          alert("Vote delegated to: " + delegateToAddress);
+        } catch (error) {
+          console.error("Error delegating vote: ", error);
+          alert("There was an error while delegating the vote.");
+        }
+      }
+
+      async function updateRemainingTime() {
+        try {
+          const remainingTimeInSeconds = await ballotContract.methods.remainingTime().call();
+          
+          const hours = Math.floor(remainingTimeInSeconds / 3600);
+          const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
+          const seconds = remainingTimeInSeconds % 60;
+
+          const timeString = `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+          document.getElementById("remainingTime").innerText = "Time remaining: " + timeString;
+        } catch (error) {
+          console.error("Error fetching remaining time: ", error);
+          alert("There was an error fetching the remaining time.");
+        }
+      }
+    </script>
+  </body>
+</html>

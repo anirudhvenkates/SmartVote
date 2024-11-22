@@ -26,15 +26,13 @@ contract Ballot {
     // Array to hold proposals
     Proposal[] public proposals;
 
-    // Create a new ballot to choose one of proposalNames
-    constructor(bytes32[] memory proposalNames, uint votingDurationInSeconds) {
-        chairperson = msg.sender;
-        voters[chairperson].weight = 1;
+    // Function to initialize the ballot with proposals and duration
+    function initializeBallot(bytes32[] memory proposalNames, uint votingDurationInSeconds) external {
+        require(msg.sender == chairperson, "Only chairperson can initialize the ballot.");
+        require(proposals.length == 0, "Ballot already initialized.");  // Ensure it can only be initialized once.
 
-        // Set the voting deadline
         deadline = block.timestamp + votingDurationInSeconds;
 
-        // Create proposals from the provided names
         for (uint i = 0; i < proposalNames.length; i++) {
             proposals.push(Proposal({
                 name: proposalNames[i],

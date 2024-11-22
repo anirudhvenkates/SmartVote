@@ -24,6 +24,19 @@ var ballotABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "votersList",
+        "type": "address[]"
+      }
+    ],
+    "name": "revokeVotingRights",
+    "outputs": [],
+    "stateMutability": "external",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "winningProposals",
     "outputs": [
