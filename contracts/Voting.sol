@@ -29,46 +29,6 @@ contract Voting {
 
     // Delegate a vote to another address
     function delegate(address to) external hasNotEnded {
-        // Access the individual components of the Voter struct via the getter function
-        (uint weight, bool voted, address delegateAddr, uint voteIndex) = ballot.voters(msg.sender); 
-
-        // Use the values returned by the getter function
-        require(weight != 0, "You have no right to vote.");
-        require(!voted, "You have already voted.");
-        require(to != msg.sender, "Self-delegation is disallowed.");
-
-        uint delegationDepth = 0;
-        address currentDelegate = to;
-
-        // Traverse through the delegation chain to find the delegate
-        while (delegateAddr != address(0)) {
-            currentDelegate = delegateAddr;
-			
-			// Fetch the next Voter's details (for the current delegate)
-			(weight, voted, delegateAddr, voteIndex) = ballot.voters(currentDelegate);
-			
-            delegationDepth++;
-            require(delegationDepth <= ballot.MAX_DELEGATION_DEPTH(), "Delegation chain too deep");
-            require(currentDelegate != msg.sender, "Found loop in delegation.");
-        }
-
-        //(uint delegateWeight, bool delegateVoted, address delegateDelegate, uint delegateVote) = ballot.voters(currentDelegate);
-		(uint delegateWeight,,,) = ballot.voters(currentDelegate);
-        require(delegateWeight >= 1, "Delegate cannot vote.");
-
-        // Sender has voted, so set them to true and mark the delegate
-		
-        // Use the delegate function from the Ballot contract
-        ballot.delegate(to);
-        
-        hasVoted[msg.sender] = true;  // Mark the sender as having voted
-
-        // If the delegate has already voted, accumulate the sender's vote count
-        //if (delegateVoted) {
-        //    ballot.proposals(delegateVote).voteCount += weight;
-        //} else {
-        //    // Otherwise, increase the delegate's weight
-        //    ballot.voters(currentDelegate).weight += weight;
-        //}
+        ballot.delegate(to,msg.sender);
     }
 }
