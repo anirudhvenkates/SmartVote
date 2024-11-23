@@ -15,6 +15,11 @@ contract Ballot {
         bytes32 name;   // short name (up to 32 bytes)
         uint voteCount; // number of accumulated votes
     }
+	
+	// Constructor to assign the chairperson at deployment
+    constructor(address wallet_address) {
+        chairperson = wallet_address;  // The deployer will be the chairperson
+    }
 
     address public chairperson;
     uint public deadline; // The deadline for voting (Unix timestamp)
@@ -82,6 +87,13 @@ contract Ballot {
 	function proposalsLength() external view returns (uint) {
 		return proposals.length;
 	}
+	
+	// Function to get details of a proposal by index
+    function getProposal(uint index) public view returns (bytes32, uint) {
+        require(index < proposals.length, "Proposal index out of bounds");
+        Proposal memory proposal = proposals[index];
+        return (proposal.name, proposal.voteCount);
+    }
 
     // Allow the chairperson to give right to vote to multiple voters at once
     function giveRightsToMultipleVoters(address[] calldata votersList) external {

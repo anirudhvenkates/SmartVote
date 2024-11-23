@@ -8,12 +8,12 @@
   <body>
     <h1>Voter Dashboard</h1>
 
-    <!-- Section to display available proposals -->
+    <!-- Section to dynamically display available proposals -->
     <div>
       <h3>Vote for a Proposal</h3>
-      <button onclick="vote(0)">Vote for Proposal 1</button>
-      <button onclick="vote(1)">Vote for Proposal 2</button>
-      <button onclick="vote(2)">Vote for Proposal 3</button>
+      <div id="proposalButtons">
+        <!-- Dynamic proposal buttons will be appended here -->
+      </div>
     </div>
 
     <!-- Section to delegate vote -->
@@ -32,15 +32,40 @@
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
-      const contractAddress = "0xcE621df27a7e9048Ba1c737861edeb0Bf69c6c5A"; // Replace with your deployed contract address
-      const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
+      const contractAddress = "0x199041D4BEF814195f62b057512789166c88214e"; // Replace with your deployed contract address
+      const voteContract = new web3.eth.Contract(voteABI, contractAddress);
+
+      async function loadProposals() {
+        try {
+          // Get the number of proposals
+          const proposalsCount = await voteContract.methods.proposalsLength().call();
+          
+          // Clear any existing buttons
+          const proposalButtonsDiv = document.getElementById("proposalButtons");
+          proposalButtonsDiv.innerHTML = '';
+
+          // Loop through each proposal and create a button for it
+          for (let i = 0; i < proposalsCount; i++) {
+            const proposal = await voteContract.methods.getProposal(i).call();
+            const proposalName = web3.utils.hexToUtf8(proposal.name);
+            const button = document.createElement('button');
+            button.innerText = `Vote for ${proposalName}`;
+            button.onclick = () => vote(i); // Pass the proposal index to the vote function
+            proposalButtonsDiv.appendChild(button);
+            proposalButtonsDiv.appendChild(document.createElement('br')); // Line break for better layout
+          }
+        } catch (error) {
+          console.error("Error loading proposals: ", error);
+          alert("There was an error fetching the proposals.");
+        }
+      }
 
       async function vote(proposalIndex) {
         try {
           const accounts = await web3.eth.requestAccounts();
           const account = accounts[0];
 
-          await ballotContract.methods.vote(proposalIndex).send({ from: account });
+          await voteContract.methods.vote(proposalIndex).send({ from: account });
           alert("Vote has been cast!");
         } catch (error) {
           console.error("Error casting vote: ", error);
@@ -59,7 +84,7 @@
             return;
           }
 
-          await ballotContract.methods.delegate(delegateToAddress).send({ from: account });
+          await voteContract.methods.delegate(delegateToAddress).send({ from: account });
           alert("Vote delegated to: " + delegateToAddress);
         } catch (error) {
           console.error("Error delegating vote: ", error);
@@ -69,7 +94,7 @@
 
       async function updateRemainingTime() {
         try {
-          const remainingTimeInSeconds = await ballotContract.methods.remainingTime().call();
+          const remainingTimeInSeconds = await voteContract.methods.remainingTime().call();
           
           const hours = Math.floor(remainingTimeInSeconds / 3600);
           const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
@@ -82,6 +107,9 @@
           alert("There was an error fetching the remaining time.");
         }
       }
+
+      // Load proposals when the page is loaded
+      window.onload = loadProposals;
     </script>
   </body>
 </html>
