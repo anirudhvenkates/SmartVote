@@ -37,7 +37,7 @@
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
-      const contractAddress = "0xC5Ed0b582c812c81A915044782E50470C2AEf2b2"; // Replace with your deployed contract address
+      const contractAddress = "0xbb9710bE116fB326161a79175Cb8a98853741c64"; // Replace with your deployed contract address
       const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
 
       async function grantVotingRights() {
