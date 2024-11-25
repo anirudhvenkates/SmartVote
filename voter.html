@@ -32,33 +32,53 @@
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
-      const contractAddress = "0x199041D4BEF814195f62b057512789166c88214e"; // Replace with your deployed contract address
-      const voteContract = new web3.eth.Contract(voteABI, contractAddress);
+      const VotecontractAddress = "0x1b4B5C2883e264213E7607A72521b1178A7F0365"; // Replace with your deployed contract address
+      const voteContract = new web3.eth.Contract(voteABI, VotecontractAddress);
+	  
+	  async function loadProposals() {
+		try {
+			// Get the number of proposals
+			const proposalsCount = await voteContract.methods.proposalsLength().call();
 
-      async function loadProposals() {
-        try {
-          // Get the number of proposals
-          const proposalsCount = await voteContract.methods.proposalsLength().call();
-          
-          // Clear any existing buttons
-          const proposalButtonsDiv = document.getElementById("proposalButtons");
-          proposalButtonsDiv.innerHTML = '';
+			// Clear any existing buttons
+			const proposalButtonsDiv = document.getElementById("proposalButtons");
+			proposalButtonsDiv.innerHTML = '';
 
-          // Loop through each proposal and create a button for it
-          for (let i = 0; i < proposalsCount; i++) {
-            const proposal = await voteContract.methods.getProposal(i).call();
-            const proposalName = web3.utils.hexToUtf8(proposal.name);
-            const button = document.createElement('button');
-            button.innerText = `Vote for ${proposalName}`;
-            button.onclick = () => vote(i); // Pass the proposal index to the vote function
-            proposalButtonsDiv.appendChild(button);
-            proposalButtonsDiv.appendChild(document.createElement('br')); // Line break for better layout
-          }
-        } catch (error) {
-          console.error("Error loading proposals: ", error);
-          alert("There was an error fetching the proposals.");
-        }
-      }
+			// Check if there are proposals
+			if (proposalsCount === 0) {
+				alert("No proposals available.");
+				return;
+			}
+
+			// Loop through each proposal and create a button for it
+			for (let i = 0; i < proposalsCount; i++) {
+			const proposal = await voteContract.methods.getProposal(i).call();
+			console.log("Proposal data:", proposal);  // Log proposal data to the console
+
+			// Get the proposal name and remove padding
+			let proposalName = web3.utils.hexToUtf8(proposal[0]);
+
+			// Clean up padding (remove trailing zeros) if necessary
+			proposalName = proposalName.replace(/\0+$/, '');
+
+			// Check if the proposal name is valid
+			if (!proposalName || proposalName === "0x") {
+				console.error("Invalid proposal name at index " + i);
+				continue; // Skip invalid proposals
+			}
+
+			// Create a button for this proposal
+			const button = document.createElement('button');
+			button.innerText = `Vote for ${proposalName}`;
+			button.onclick = () => vote(i); // Pass the proposal index to the vote function
+			proposalButtonsDiv.appendChild(button);
+			proposalButtonsDiv.appendChild(document.createElement('br')); // Line break for better layout
+			}
+	} catch (error) {
+		console.error("Error loading proposals: ", error);
+		alert("There was an error fetching the proposals.");
+	}
+	}
 
       async function vote(proposalIndex) {
         try {
