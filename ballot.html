@@ -37,7 +37,7 @@
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
-      const contractAddress = "0x7fcC91c275fC6aa2499296C73cC0753983aD92b8"; // Replace with your deployed contract address
+      const contractAddress = "0x99B241063895c78fb5cd6Eb697500db2c7013365"; // Replace with your deployed contract address
       const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
 
       async function grantVotingRights() {
@@ -99,7 +99,6 @@
           }
 
           await ballotContract.methods.initializeBallot(proposalNames, votingDurationInSeconds).send({ from: accounts[0] });
-		  console.log(proposalNames);
           alert("Ballot initialized with proposals and voting duration!");
         } catch (error) {
           console.error("Error initializing ballot: ", error);

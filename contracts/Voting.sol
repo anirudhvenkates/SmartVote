@@ -42,15 +42,4 @@ contract Voting {
     function delegate(address to) external hasNotEnded {
         ballot.delegate(to,msg.sender);
     }
-	
-	// Get the remaining time until the voting ends (in seconds)
-    function remainingTime() external view returns (uint) {
-        // Calculate the remaining time (subtract deadline from current block timestamp)
-		uint deadline = ballot.deadline();
-        if (block.timestamp >= deadline) {
-            return 0; // Voting has ended
-        } else {
-            return deadline - block.timestamp; // Time remaining
-        }
-    }
 }

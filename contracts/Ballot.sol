@@ -157,4 +157,13 @@ contract Ballot {
     function winnerName() external view returns (bytes32 winnerName_) {
         winnerName_ = proposals[winningProposals()].name;
     }
+
+    // Get the remaining time until the voting ends (in seconds)
+    function remainingTime() external view returns (uint) {
+        if (block.timestamp >= deadline) {
+            return 0;
+        } else {
+            return deadline - block.timestamp;
+        }
+    }
 }
