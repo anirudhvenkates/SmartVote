@@ -37,16 +37,16 @@
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
-      const contractAddress = "0x99B241063895c78fb5cd6Eb697500db2c7013365"; // Replace with your deployed contract address
+      const contractAddress = "0xbb9710bE116fB326161a79175Cb8a98853741c64"; // Replace with your deployed contract address
       const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
 
       async function grantVotingRights() {
         try {
           const accounts = await web3.eth.requestAccounts();
-          //const chairpersonAddress = accounts[0];
+          const chairpersonAddress = accounts[0];
           const votersAddresses = document.getElementById('votersList').value.split(',');
 
-          await ballotContract.methods.giveRightsToMultipleVoters(votersAddresses).send({ from: accounts[0] });
+          await ballotContract.methods.giveRightsToMultipleVoters(votersAddresses).send({ from: chairpersonAddress });
           alert("Voting rights granted!");
         } catch (error) {
           console.error("Error granting voting rights: ", error);
@@ -57,10 +57,10 @@
       async function revokeVotingRights() {
         try {
           const accounts = await web3.eth.requestAccounts();
-          //const chairpersonAddress = accounts[0];
+          const chairpersonAddress = accounts[0];
           const votersAddresses = document.getElementById('revokeVotersList').value.split(',');
 
-          await ballotContract.methods.revokeVotingRights(votersAddresses).send({ from: accounts[0] });
+          await ballotContract.methods.revokeVotingRights(votersAddresses).send({ from: chairpersonAddress });
           alert("Voting rights revoked!");
         } catch (error) {
           console.error("Error revoking voting rights: ", error);
@@ -81,7 +81,7 @@
 	  async function initializeBallot() {
         try {
           const accounts = await web3.eth.requestAccounts();
-          //const chairpersonAddress = accounts[0];
+          const chairpersonAddress = accounts[0];
 
           // Get the proposal names from the input field
           const proposalNamesInput = document.getElementById('proposalNames').value;
@@ -98,7 +98,7 @@
             return;
           }
 
-          await ballotContract.methods.initializeBallot(proposalNames, votingDurationInSeconds).send({ from: accounts[0] });
+          await ballotContract.methods.initializeBallot(proposalNames, votingDurationInSeconds).send({ from: chairpersonAddress });
           alert("Ballot initialized with proposals and voting duration!");
         } catch (error) {
           console.error("Error initializing ballot: ", error);

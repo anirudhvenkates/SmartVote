@@ -16,17 +16,6 @@ contract Voting {
         _;
     }
 
-    // Function to get the number of proposals
-    function proposalsLength() public view returns (uint) {
-        return ballot.proposalsLength(); // Call Ballot's proposalsLength function
-    }
-
-    // Function to get details of a proposal by index from the Ballot contract
-    function getProposal(uint index) public view returns (bytes32, uint) {
-        //require(index < ballot.proposalsLength(), "Proposal index out of bounds"); // Use Ballot's proposalsLength function
-        return ballot.getProposal(index); // Call Ballot's getProposal function
-    }
-
     // Cast a vote for a proposal
     function vote(uint proposalIndex) external hasNotEnded {
         require(!hasVoted[msg.sender], "You have already voted.");
