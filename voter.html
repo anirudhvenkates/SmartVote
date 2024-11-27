@@ -32,15 +32,15 @@
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
-      const contractAddress = "0xC5Ed0b582c812c81A915044782E50470C2AEf2b2"; // Replace with your deployed contract address
-      const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
+      const contractAddress = "0x074F61C167c41E2Ab66800390b6BC99eB530328F"; // Replace with your deployed contract address
+      const voteContract = new web3.eth.Contract(voteABI, contractAddress);
 
       async function vote(proposalIndex) {
         try {
           const accounts = await web3.eth.requestAccounts();
           const account = accounts[0];
 
-          await ballotContract.methods.vote(proposalIndex).send({ from: account });
+          await voteContract.methods.vote(proposalIndex).send({ from: account });
           alert("Vote has been cast!");
         } catch (error) {
           console.error("Error casting vote: ", error);
@@ -59,7 +59,7 @@
             return;
           }
 
-          await ballotContract.methods.delegate(delegateToAddress).send({ from: account });
+          await voteContract.methods.delegate(delegateToAddress).send({ from: account });
           alert("Vote delegated to: " + delegateToAddress);
         } catch (error) {
           console.error("Error delegating vote: ", error);
@@ -69,7 +69,7 @@
 
       async function updateRemainingTime() {
         try {
-          const remainingTimeInSeconds = await ballotContract.methods.remainingTime().call();
+          const remainingTimeInSeconds = await voteContract.methods.remainingTime().call();
           
           const hours = Math.floor(remainingTimeInSeconds / 3600);
           const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
