@@ -2,6 +2,19 @@ var ballotABI = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "chairpersonAddress",
+        "type": "address"
+      }
+    ],
+    "name": "constructor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32[]",
         "name": "proposalNames",
         "type": "bytes32[]"
@@ -10,15 +23,25 @@ var ballotABI = [
         "internalType": "uint256",
         "name": "votingDurationInSeconds",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "chairpersonAddress",
-        "type": "address"
       }
     ],
+    "name": "initializeBallot",
+    "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "constructor"
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proposalsLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -30,7 +53,46 @@ var ballotABI = [
     ],
     "name": "giveRightsToMultipleVoters",
     "outputs": [],
-    "stateMutability": "external",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "votersList",
+        "type": "address[]"
+      }
+    ],
+    "name": "revokeVotingRights",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "delegate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposal",
+        "type": "uint256"
+      }
+    ],
+    "name": "voteForProposal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -48,12 +110,12 @@ var ballotABI = [
   },
   {
     "inputs": [],
-    "name": "remainingTime",
+    "name": "winnerName",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "winnerName_",
+        "type": "bytes32"
       }
     ],
     "stateMutability": "view",
@@ -61,12 +123,12 @@ var ballotABI = [
   },
   {
     "inputs": [],
-    "name": "winnerName",
+    "name": "remainingTime",
     "outputs": [
       {
-        "internalType": "bytes32",
-        "name": "winnerName_",
-        "type": "bytes32"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -138,6 +200,19 @@ var ballotABI = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "deadline",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

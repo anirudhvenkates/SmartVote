@@ -71,4 +71,13 @@ contract Voting {
         //    ballot.voters(currentDelegate).weight += weight;
         //}
     }
+
+    // Get the remaining time until the voting ends (in seconds)
+    function remainingTime() external view returns (uint) {
+        if (block.timestamp >= ballot.deadline()) {
+            return 0;
+        } else {
+            return ballot.deadline() - block.timestamp;
+        }
+    }
 }
