@@ -18,7 +18,7 @@ contract Ballot {
 
     address public chairperson;
     uint public deadline; // The deadline for voting (Unix timestamp)
-	uint public constant MAX_DELEGATION_DEPTH = 3;
+    uint public constant MAX_DELEGATION_DEPTH = 5;
 
     // Mapping from address to Voter struct
     mapping(address => Voter) public voters;
@@ -39,38 +39,6 @@ contract Ballot {
                 voteCount: 0
             }));
         }
-    }
-	// Delegate vote to another voter
-    function delegate(address to, address from) external hasNotEnded {
-        Voter storage sender = voters[from];
-        require(sender.weight != 0, "You have no right to vote");
-        require(!sender.voted, "You already voted.");
-        require(to != msg.sender, "Self-delegation is disallowed.");
-
-        uint delegationDepth = 0;
-        while (voters[to].delegate != address(0)) {
-            to = voters[to].delegate;
-            delegationDepth++;
-            require(delegationDepth <= MAX_DELEGATION_DEPTH, "Delegation chain too deep");
-            require(to != msg.sender, "Found loop in delegation.");
-        }
-
-        Voter storage delegate_ = voters[to];
-        require(delegate_.weight >= 1, "Delegate cannot vote");
-
-        sender.voted = true;
-        sender.delegate = to;
-
-        if (delegate_.voted) {
-            proposals[delegate_.vote].voteCount += sender.weight;
-        } else {
-            delegate_.weight += sender.weight;
-        }
-    }
-	
-	// Getter function for voters mapping
-    function getVoter(address voterAddress) external view returns (Voter memory) {
-        return voters[voterAddress];
     }
 
     // Function to check if the voting deadline has passed
@@ -103,6 +71,34 @@ contract Ballot {
 			voters[voter].weight = 0;
 		}
 	}
+
+    // Delegate vote to another voter
+    function delegate(address to) external hasNotEnded {
+        Voter storage sender = voters[msg.sender];
+        require(sender.weight != 0, "You have no right to vote");
+        require(!sender.voted, "You already voted.");
+        require(to != msg.sender, "Self-delegation is disallowed.");
+
+        uint delegationDepth = 0;
+        while (voters[to].delegate != address(0)) {
+            to = voters[to].delegate;
+            delegationDepth++;
+            require(delegationDepth <= MAX_DELEGATION_DEPTH, "Delegation chain too deep");
+            require(to != msg.sender, "Found loop in delegation.");
+        }
+
+        Voter storage delegate_ = voters[to];
+        require(delegate_.weight >= 1, "Delegate cannot vote");
+
+        sender.voted = true;
+        sender.delegate = to;
+
+        if (delegate_.voted) {
+            proposals[delegate_.vote].voteCount += sender.weight;
+        } else {
+            delegate_.weight += sender.weight;
+        }
+    }
 
     // Cast a vote for a proposal
     function voteForProposal(uint proposal) external hasNotEnded {
