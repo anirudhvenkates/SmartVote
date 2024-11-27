@@ -7,9 +7,12 @@ module.exports = function(deployer) {
 
   // Define the voting duration in seconds (e.g., 1 day)
   const votingDurationInSeconds = 24 * 60 * 60;  // 24 hours in seconds
+  
+  // Hardcode the chairperson address here
+  const chairpersonAddress = "0x87E78674B86E64f1a4cA0B55D40EEC692C5a367f"; // Replace with actual chairperson address
 
   // Deploy the Ballot contract with the necessary parameters
-  deployer.deploy(Ballot, proposalNames, votingDurationInSeconds)
+  deployer.deploy(Ballot, proposalNames, votingDurationInSeconds, chairpersonAddress)
     .then(function() {
       // After the Ballot contract is deployed, get its address
       const ballotAddress = Ballot.address;

@@ -27,8 +27,8 @@ contract Ballot {
     Proposal[] public proposals;
 
     // Create a new ballot to choose one of proposalNames
-    constructor(bytes32[] memory proposalNames, uint votingDurationInSeconds) {
-        chairperson = msg.sender;
+    constructor(bytes32[] memory proposalNames, uint votingDurationInSeconds, address chairpersonAddress) {
+        chairperson = chairpersonAddress; // Set the chairperson to the provided address
         voters[chairperson].weight = 1;
 
         // Set the voting deadline

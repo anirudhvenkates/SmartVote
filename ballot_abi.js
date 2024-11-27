@@ -5,6 +5,16 @@ var ballotABI = [
         "internalType": "bytes32[]",
         "name": "proposalNames",
         "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "votingDurationInSeconds",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "chairpersonAddress",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -133,4 +143,4 @@ var ballotABI = [
     "stateMutability": "view",
     "type": "function"
   }
-];
+]
