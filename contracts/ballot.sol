@@ -20,7 +20,7 @@ contract Ballot {
 
     address public chairperson;
     uint public deadline; // The deadline for voting (unix timestamp)
-	uint public constant MAX_DELEGATION_DEPTH = 5;
+	uint public constant MAX_DELEGATION_DEPTH = 3;
 
     // This declares a state variable that
     // stores a Voter struct for each possible address.
@@ -84,6 +84,12 @@ contract Ballot {
 		require(to != msg.sender, "Self-delegation is disallowed.");
 
 		uint delegationDepth = 0;
+		
+		/**
+		This is the critical part of the logic. Delegation in this contract can form a chain (one voter delegates to another, who may delegate to someone else, and so on). This function follows the chain of delegation.
+		address(0) is a special address in Ethereum that represents the zero address, which is often used to signify "no address" or "not set".
+		voters[to].delegate != address(0) is checking if the to address (the delegate) has already delegated their vote to someone else. If to hasn't delegated their vote to anyone, voters[to].delegate will be address(0).
+		*/
 		while (voters[to].delegate != address(0)) {
 			to = voters[to].delegate;
 			delegationDepth++;
@@ -91,15 +97,18 @@ contract Ballot {
 			require(to != msg.sender, "Found loop in delegation.");
 		}
 
+		//Ensure the delegate has voting rights
 		Voter storage delegate_ = voters[to];
 		require(delegate_.weight >= 1, "Delegate cannot vote");
 
 		sender.voted = true;
 		sender.delegate = to;
 
+		//If the delegate has already voted, the sender's weight is added to the proposal they voted for
 		if (delegate_.voted) {
 			proposals[delegate_.vote].voteCount += sender.weight;
 		} else {
+			//If the delegate hasn't voted yet, the sender's weight is added to the delegate's weight
 			delegate_.weight += sender.weight;
 		}
 	}

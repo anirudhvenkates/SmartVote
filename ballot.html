@@ -33,7 +33,7 @@
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
 
-      const contractAddress = "0x296b867F717e9166Ac2c0B0d511363C30D6CEA69"; // Replace with your deployed contract address
+      const contractAddress = "0xC5798141Ae3341DdC17AdfA7a69B6D51e63B6ee2"; // Replace with your deployed contract address
       const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
       
       // Function to grant voting rights (called by chairperson)
