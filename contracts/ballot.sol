@@ -31,8 +31,8 @@ contract Ballot {
 
     /// Create a new ballot to choose one of proposalNames.
     /// The chairperson can also set a deadline (in Unix timestamp).
-    constructor(bytes32[] memory proposalNames, uint votingDurationInSeconds) {
-        chairperson = msg.sender;
+    constructor(bytes32[] memory proposalNames, uint votingDurationInSeconds, address chairpersonAddress) {
+        chairperson = chairpersonAddress;
         voters[chairperson].weight = 1;
         
         // Set the voting deadline
@@ -66,6 +66,16 @@ contract Ballot {
             voters[voter].weight = 1;
         }
     }
+	
+	// Allow the chairperson to revoke right to vote to multiple voters at once
+	function revokeVotingRights(address[] calldata votersList) external {
+		require(msg.sender == chairperson, "Only chairperson can revoke rights.");
+		for (uint i = 0; i < votersList.length; i++) {
+			address voter = votersList[i];
+			require(voters[voter].weight == 1, "The voter does not have voting rights.");
+			voters[voter].weight = 0;
+		}
+	}
 
     function delegate(address to) external hasNotEnded {
 		Voter storage sender = voters[msg.sender];
@@ -133,6 +143,7 @@ contract Ballot {
 
     // Get the name of the winning proposal
     function winnerName() external view returns (bytes32 winnerName_) {
+		//require(msg.sender == chairperson, "Only chairperson can see winner details.");
         winnerName_ = proposals[winningProposals()].name;
     }
 
