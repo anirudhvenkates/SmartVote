@@ -60,17 +60,32 @@ contract Ballot {
 
     // Allow the chairperson to give right to vote to multiple voters at once
     function giveRightsToMultipleVoters(address[] calldata votersList) external {
-        require(msg.sender == chairperson, "Only chairperson can give right to vote.");
+    require(msg.sender == chairperson, "Only chairperson can give right to vote.");
     
-        for (uint i = 0; i < votersList.length; i++) {
-            address voter = votersList[i];
-            require(!voters[voter].voted, "The voter already voted.");
-            require(voters[voter].weight == 0, "The voter already has voting rights.");
-            voters[voter].weight = 1;
-            voterAddresses.push(voter);  // Add to the list of voter addresses
+    for (uint i = 0; i < votersList.length; i++) {
+        address voter = votersList[i];
+        require(!voters[voter].voted, "The voter already voted.");
+        require(voters[voter].weight == 0, "The voter already has voting rights.");
+        
+        // Grant voting rights
+        voters[voter].weight = 1;
+
+        // Check if the voter is already in the list to avoid duplicates
+        bool alreadyAdded = false;
+        for (uint j = 0; j < voterAddresses.length; j++) {
+            if (voterAddresses[j] == voter) {
+                alreadyAdded = true;
+                break;
+            }
+        }
+
+        // If not already added, push to the voterAddresses array
+        if (!alreadyAdded) {
+            voterAddresses.push(voter);
         }
     }
-	
+	}
+
     // Allow the chairperson to revoke right to vote to multiple voters at once
     function revokeVotingRights(address[] calldata votersList) external {
         require(msg.sender == chairperson, "Only chairperson can revoke rights.");
@@ -96,42 +111,42 @@ contract Ballot {
     }
 	
 	// Function to get all voters' information in a simple array format
-function getVotersInfo() public view returns (string[] memory) {
-    string[] memory votersInfo = new string[](voterAddresses.length);
+	function getVotersInfo() public view returns (string[] memory) {
+		string[] memory votersInfo = new string[](voterAddresses.length);
 
-    for (uint i = 0; i < voterAddresses.length; i++) {
-        address voterAddress = voterAddresses[i];
-        Voter storage voter = voters[voterAddress];
-        
-        string memory voterStatus = voter.voted ? "Voted" : "Not Voted";
-        string memory weight = voter.weight > 0 ? "Voting Rights" : "No Voting Rights";
-        string memory delegateAddress = (voter.delegate == address(0)) ? "No Delegate" : toString(voter.delegate);
+		for (uint i = 0; i < voterAddresses.length; i++) {
+			address voterAddress = voterAddresses[i];
+			Voter storage voter = voters[voterAddress];
+			
+			string memory voterStatus = voter.voted ? "Voted" : "Not Voted";
+			string memory weight = voter.weight > 0 ? "Voting Rights" : "No Voting Rights";
+			string memory delegateAddress = (voter.delegate == address(0)) ? "No Delegate" : toString(voter.delegate);
 
-        // Format the information as a string
-        votersInfo[i] = string(abi.encodePacked(
-            "Address: ", toString(voterAddress),
-            ", Status: ", voterStatus,
-            ", Weight: ", weight,
-            ", Delegate: ", delegateAddress
-        ));
-    }
+			// Format the information as a string
+			votersInfo[i] = string(abi.encodePacked(
+				"Address: ", toString(voterAddress),
+				", Status: ", voterStatus,
+				", Weight: ", weight,
+				", Delegate: ", delegateAddress
+			));
+		}
 
-    return votersInfo;
-}
+		return votersInfo;
+	}
 
-// Helper function to convert an address to a string
-function toString(address addr) internal pure returns (string memory) {
-    bytes32 value = bytes32(uint256(uint160(addr)));
-    bytes memory alphabet = "0123456789abcdef";
-    bytes memory str = new bytes(42);
-    str[0] = '0';
-    str[1] = 'x';
-    for (uint i = 0; i < 20; i++) {
-        str[2+i*2] = alphabet[uint8(value[i + 12] >> 4)];
-        str[3+i*2] = alphabet[uint8(value[i + 12] & 0x0f)];
-    }
-    return string(str);
-}
+	// Helper function to convert an address to a string
+	function toString(address addr) internal pure returns (string memory) {
+		bytes32 value = bytes32(uint256(uint160(addr)));
+		bytes memory alphabet = "0123456789abcdef";
+		bytes memory str = new bytes(42);
+		str[0] = '0';
+		str[1] = 'x';
+		for (uint i = 0; i < 20; i++) {
+			str[2+i*2] = alphabet[uint8(value[i + 12] >> 4)];
+			str[3+i*2] = alphabet[uint8(value[i + 12] & 0x0f)];
+		}
+		return string(str);
+	}
 
 
     // Delegate the vote to another voter
