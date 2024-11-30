@@ -3,6 +3,20 @@
     <title>SmartVote Ballot</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
     <script src="ballot_abi.js"></script>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
   </head>
   <body>
     <h1>Grant Voting Rights</h1>
@@ -29,11 +43,43 @@
       <p id="remainingTime">Click to load remaining time...</p>
       <button onclick="updateRemainingTime()">Check Remaining Time</button>
     </div>
+    
+    <h1>Voters Information</h1>
+    <div>
+      <button onclick="getVotersInfo()">Get Voters Info</button>
+    </div>
+    
+    <h2>Voters with Voting Rights</h2>
+    <table id="votersWithRights">
+      <thead>
+        <tr>
+          <th>Address</th>
+          <th>Status</th>
+          <th>Weight</th>
+          <th>Delegate Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Voters with Voting Rights will be inserted here -->
+      </tbody>
+    </table>
+
+    <h2>Voters with Revoked Rights</h2>
+    <table id="votersWithRevokedRights">
+      <thead>
+        <tr>
+          <th>Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Voters with Revoked Rights will be inserted here -->
+      </tbody>
+    </table>
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
 
-      const contractAddress = "0xC5798141Ae3341DdC17AdfA7a69B6D51e63B6ee2"; // Replace with your deployed contract address
+      const contractAddress = "0x619bBabADc297161D97e1D5B74BdB53FaCC3EfFb"; // Replace with your deployed contract address
       const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
       
       // Function to grant voting rights (called by chairperson)
@@ -92,6 +138,47 @@
         } catch (error) {
           console.error("Error revoking voting rights: ", error);
           alert("There was an error while revoking voting rights.");
+        }
+      }
+      
+      async function getVotersInfo() {
+        try {
+          const votersInfo = await ballotContract.methods.getVotersInfo().call();
+
+          // Clear previous tables
+          document.getElementById("votersWithRights").getElementsByTagName('tbody')[0].innerHTML = '';
+          document.getElementById("votersWithRevokedRights").getElementsByTagName('tbody')[0].innerHTML = '';
+
+          // Categorize voters into two groups
+          votersInfo.forEach(info => {
+            // Split the information by commas to parse it
+            const voterInfo = info.split(", ");
+            const address = voterInfo[0].replace("Address: ", "").trim();
+            const status = voterInfo[1].replace("Status: ", "").trim();
+            const weight = voterInfo[2].replace("Weight: ", "").trim();
+            const delegate = voterInfo[3].replace("Delegate: ", "").trim();
+
+            // Check weight to categorize the voters
+            if (weight === "Voting Rights") {
+              // Voter with voting rights (weight > 0)
+              const row = `<tr>
+                            <td>${address}</td>
+                            <td>${status}</td>
+                            <td>${weight}</td>
+                            <td>${delegate}</td>
+                          </tr>`;
+              document.getElementById("votersWithRights").getElementsByTagName('tbody')[0].innerHTML += row;
+            } else {
+              // Voter with revoked rights (weight = 0)
+              const row = `<tr>
+                            <td>${address}</td>
+                          </tr>`;
+              document.getElementById("votersWithRevokedRights").getElementsByTagName('tbody')[0].innerHTML += row;
+            }
+          });
+        } catch (error) {
+          console.error("Error fetching voters info: ", error);
+          alert("There was an error fetching the voters' information.");
         }
       }
       
