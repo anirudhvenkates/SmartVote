@@ -32,6 +32,17 @@
       <textarea id="revokeVotersList" placeholder="Enter addresses separated by commas"></textarea><br><br>
       <button onclick="revokeVotingRights()">Revoke Voting Rights</button>
     </div>
+	
+	<h1>Adjust Voter Weight</h1>
+	<div>
+	  <!-- Text area for inputting a voter's address -->
+	  <input type="text" id="voterAddress" placeholder="Enter voter's address" /><br><br>
+	  
+	  <!-- Input for new weight -->
+	  <input type="number" id="newWeight" placeholder="Enter new weight" /><br><br>
+	  
+	  <button onclick="adjustVoterWeight()">Adjust Voter Weight</button>
+	</div>
     
     <h1>Declare Winner</h1>
     <div>
@@ -79,7 +90,7 @@
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
 
-      const contractAddress = "0xc642f89f040BAf0ca423A627423d312723A40020"; // Replace with your deployed contract address
+      const contractAddress = "0xcFA1A690bdbbA3E649EBFC4ef0Ea28ad6b5c2D00"; // Replace with your deployed contract address
       const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
       
       // Function to grant voting rights (called by chairperson)
@@ -141,6 +152,44 @@
         }
       }
       
+	  // Function to adjust the weight of a voter
+	  async function adjustVoterWeight() {
+	  try {
+		const accounts = await web3.eth.requestAccounts();
+		const connectedAddress = accounts[0];  // Get the connected account
+		
+		// Check if the connected account is the chairperson
+		const chairpersonAddress = await ballotContract.methods.chairperson().call();
+
+		if (connectedAddress !== chairpersonAddress) {
+		  alert("Only the chairperson can adjust voter weights.");
+		  return;
+		}
+
+		// Get the voter address and new weight from the input fields
+		const voterAddress = document.getElementById('voterAddress').value.trim();
+		const newWeight = parseInt(document.getElementById('newWeight').value);
+
+		if (!web3.utils.isAddress(voterAddress)) {
+		  alert("Please enter a valid Ethereum address.");
+		  return;
+		}
+
+		if (isNaN(newWeight) || newWeight <= 0) {
+		  alert("Please enter a valid weight greater than zero.");
+		  return;
+		}
+
+		// Call the contract method to adjust the voter's weight
+		await ballotContract.methods.adjustVotingWeight(voterAddress, newWeight).send({ from: chairpersonAddress });
+		alert("Voter weight adjusted successfully!");
+	  } catch (error) {
+		console.error("Error adjusting voter weight: ", error);
+		alert("There was an error while adjusting the voter weight.");
+		}
+		}
+
+	  
       async function getVotersInfo() {
         try {
           const votersInfo = await ballotContract.methods.getVotersInfo().call();

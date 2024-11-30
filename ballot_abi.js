@@ -21,6 +21,50 @@ var ballotABI = [
     "type": "constructor"
   },
   {
+    "inputs": [],
+    "name": "chairperson",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "deadline",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "newWeight",
+        "type": "uint256"
+      }
+    ],
+    "name": "adjustVotingWeight",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address[]",
@@ -57,6 +101,25 @@ var ballotABI = [
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "toString",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -126,51 +189,12 @@ var ballotABI = [
   },
   {
     "inputs": [],
-    "name": "chairperson",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "deadline",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "MAX_DELEGATION_DEPTH",
     "outputs": [
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "voterAddresses",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -187,31 +211,24 @@ var ballotABI = [
     "name": "voters",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "weight",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "voted",
-            "type": "bool"
-          },
-          {
-            "internalType": "address",
-            "name": "delegate",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "vote",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Ballot.Voter",
-        "name": "",
-        "type": "tuple"
+        "internalType": "uint256",
+        "name": "weight",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "voted",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "delegate",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vote",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -228,21 +245,27 @@ var ballotABI = [
     "name": "proposals",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "bytes32",
-            "name": "name",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "uint256",
-            "name": "voteCount",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Ballot.Proposal",
+        "internalType": "bytes32",
+        "name": "name",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "voteCount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "voterAddresses",
+    "outputs": [
+      {
+        "internalType": "address[]",
         "name": "",
-        "type": "tuple"
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",

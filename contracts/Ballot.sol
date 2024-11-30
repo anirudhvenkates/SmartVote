@@ -57,6 +57,15 @@ contract Ballot {
         require(block.timestamp <= deadline, "Voting period has ended.");
         _;
     }
+	
+	// Function to increase or decrease the weight of a voter (but not set it to zero)
+	function adjustVotingWeight(address voter, uint newWeight) external {
+		require(msg.sender == chairperson, "Only the chairperson can adjust the weight.");
+		require(voters[voter].weight != 0, "Voter has no voting rights.");
+		require(newWeight > 0, "Weight must be greater than zero.");
+		
+		voters[voter].weight = newWeight;
+	}
 
     // Allow the chairperson to give right to vote to multiple voters at once
     function giveRightsToMultipleVoters(address[] calldata votersList) external {
