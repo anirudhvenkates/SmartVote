@@ -18,31 +18,42 @@
       }
     </style>
   </head>
+  <h3>Create a New Ballot</h3>
+    <form id="createBallotForm">
+      <label for="proposalNames">Proposals (comma separated):</label><br>
+      <input type="text" id="proposalNames" placeholder="Enter proposal names"><br><br>
+      
+      <label for="votingDuration">Voting Duration (in seconds):</label><br>
+      <input type="number" id="votingDuration" placeholder="Enter duration in seconds"><br><br>
+
+      <button type="button" onclick="createBallot()">Create Ballot</button>
+    </form><br>
+  
   <body>
+    <h1>Enter Ballot ID</h1>
+    <div>
+      <input type="text" id="ballotIdInput" placeholder="Enter ballot ID" /><br><br>
+      <button onclick="getBallotAddress()">Load Ballot</button>
+    </div>
+    
     <h1>Grant Voting Rights</h1>
     <div>
-      <!-- Text area for inputting voters' addresses -->
       <textarea id="votersList" placeholder="Enter addresses separated by commas"></textarea><br><br>
       <button onclick="grantVotingRights()">Grant Voting Rights</button>
     </div>
     
     <div>
       <h3>Revoke Voting Rights</h3>
-      <!-- Text area for inputting voters' addresses -->
       <textarea id="revokeVotersList" placeholder="Enter addresses separated by commas"></textarea><br><br>
       <button onclick="revokeVotingRights()">Revoke Voting Rights</button>
     </div>
-	
-	<h1>Adjust Voter Weight</h1>
-	<div>
-	  <!-- Text area for inputting a voter's address -->
-	  <input type="text" id="voterAddress" placeholder="Enter voter's address" /><br><br>
-	  
-	  <!-- Input for new weight -->
-	  <input type="number" id="newWeight" placeholder="Enter new weight" /><br><br>
-	  
-	  <button onclick="adjustVoterWeight()">Adjust Voter Weight</button>
-	</div>
+    
+    <h1>Adjust Voter Weight</h1>
+    <div>
+      <input type="text" id="voterAddress" placeholder="Enter voter's address" /><br><br>
+      <input type="number" id="newWeight" placeholder="Enter new weight" /><br><br>
+      <button onclick="adjustVoterWeight()">Adjust Voter Weight</button>
+    </div>
     
     <h1>Declare Winner</h1>
     <div>
@@ -70,9 +81,7 @@
           <th>Delegate Address</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Voters with Voting Rights will be inserted here -->
-      </tbody>
+      <tbody></tbody>
     </table>
 
     <h2>Voters with Revoked Rights</h2>
@@ -82,24 +91,72 @@
           <th>Address</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Voters with Revoked Rights will be inserted here -->
-      </tbody>
+      <tbody></tbody>
     </table>
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
+      let ballotContract;
+	  const ballotManagerAddress = "0x9367a299510Fc9FFab81CA9555CB953A02712f22"; // Replace with BallotManager contract address
+      const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
 
-      const contractAddress = "0xcFA1A690bdbbA3E649EBFC4ef0Ea28ad6b5c2D00"; // Replace with your deployed contract address
-      const ballotContract = new web3.eth.Contract(ballotABI, contractAddress);
-      
-      // Function to grant voting rights (called by chairperson)
+      // Function to fetch the ballot contract address from the BallotManager contract
+      async function getBallotAddress() {
+		const ballotIdInput = document.getElementById("ballotIdInput").value;
+		if (!ballotIdInput) {
+			alert("Please enter a valid ballot ID.");
+			return;
+		}
+		
+        try {
+          const ballotAddress = await ballotManagerContract.methods.getBallotAddress(ballotIdInput).call();
+
+          if (ballotAddress === "0x0000000000000000000000000000000000000000") {
+            alert("No ballot found for the given ID.");
+            return null;
+          }
+
+          // Set the ballot contract
+          ballotContract = new web3.eth.Contract(ballotABI, ballotAddress);
+          alert(`Ballot contract set to: ${ballotAddress}`);
+		  console.log("Ballot contract set to: ", ballotAddress);
+        } catch (error) {
+          console.error("Error fetching ballot address:", error);
+          alert("There was an error fetching the ballot.");
+        }
+      }
+	  
+	  // Function to create a new ballot
+      async function createBallot() {
+		  const proposalNames = document.getElementById('proposalNames').value.split(',').map(p => p.trim());
+		  const votingDurationInSeconds = document.getElementById('votingDuration').value;
+
+		  // Check if proposals are valid
+		  if (proposalNames.length === 0 || isNaN(votingDurationInSeconds) || votingDurationInSeconds <= 0) {
+			alert("Please enter valid proposal names and voting duration.");
+			return;
+		  }
+
+		  // Convert proposal names to bytes32 array (if the smart contract requires it)
+		  const proposalNamesBytes32 = proposalNames.map(p => web3.utils.asciiToHex(p));
+		  
+		  // Assuming the smart contract expects proposal names as bytes32[]
+		  const accounts = await web3.eth.requestAccounts();
+		  const chairperson = accounts[0];
+
+		  try {
+			await ballotManagerContract.methods.createBallot(proposalNamesBytes32, votingDurationInSeconds).send({ from: chairperson });
+			alert("New ballot created!");
+		  } catch (error) {
+			console.error("Error creating ballot:", error);
+			alert("There was an error creating the ballot.");
+		  }
+		}
+
       async function grantVotingRights() {
         try {
           const accounts = await web3.eth.requestAccounts();
-          const connectedAddress = accounts[0];  // Get the connected account
-          
-          // Check if the connected account is the chairperson
+          const connectedAddress = accounts[0];  
           const chairpersonAddress = await ballotContract.methods.chairperson().call();
 
           if (connectedAddress !== chairpersonAddress) {
@@ -107,28 +164,24 @@
             return;
           }
 
-          // Get voter addresses from the textarea input field
           const voterAddresses = document.getElementById('votersList').value.split(',').map(address => address.trim());
-
           if (voterAddresses.length === 0 || voterAddresses.some(address => !web3.utils.isAddress(address))) {
             alert("Please enter valid Ethereum addresses separated by commas.");
             return;
           }
 
-          await ballotContract.methods.giveRightsToMultipleVoters(voterAddresses).send({ from: chairpersonAddress });
+          await ballotContract.methods.giveVotingRights(voterAddresses).send({ from: chairpersonAddress });
           alert("Voting rights granted!");
         } catch (error) {
           console.error("Error granting voting rights: ", error);
           alert("There was an error while granting voting rights.");
         }
       }
-      
+
       async function revokeVotingRights() {
         try {
           const accounts = await web3.eth.requestAccounts();
-          const connectedAddress = accounts[0];  // Get the connected account
-          
-          // Check if the connected account is the chairperson
+          const connectedAddress = accounts[0];  
           const chairpersonAddress = await ballotContract.methods.chairperson().call();
 
           if (connectedAddress !== chairpersonAddress) {
@@ -136,9 +189,7 @@
             return;
           }
 
-          // Get voter addresses from the textarea input field
           const votersAddresses = document.getElementById('revokeVotersList').value.split(',').map(address => address.trim());
-
           if (votersAddresses.length === 0 || votersAddresses.some(address => !web3.utils.isAddress(address))) {
             alert("Please enter valid Ethereum addresses separated by commas.");
             return;
@@ -151,65 +202,75 @@
           alert("There was an error while revoking voting rights.");
         }
       }
-      
-	  // Function to adjust the weight of a voter
-	  async function adjustVoterWeight() {
-	  try {
-		const accounts = await web3.eth.requestAccounts();
-		const connectedAddress = accounts[0];  // Get the connected account
-		
-		// Check if the connected account is the chairperson
-		const chairpersonAddress = await ballotContract.methods.chairperson().call();
 
-		if (connectedAddress !== chairpersonAddress) {
-		  alert("Only the chairperson can adjust voter weights.");
-		  return;
-		}
+      async function adjustVoterWeight() {
+        try {
+          const accounts = await web3.eth.requestAccounts();
+          const connectedAddress = accounts[0];  
+          const chairpersonAddress = await ballotContract.methods.chairperson().call();
 
-		// Get the voter address and new weight from the input fields
-		const voterAddress = document.getElementById('voterAddress').value.trim();
-		const newWeight = parseInt(document.getElementById('newWeight').value);
+          if (connectedAddress !== chairpersonAddress) {
+            alert("Only the chairperson can adjust voter weights.");
+            return;
+          }
 
-		if (!web3.utils.isAddress(voterAddress)) {
-		  alert("Please enter a valid Ethereum address.");
-		  return;
-		}
+          const voterAddress = document.getElementById('voterAddress').value.trim();
+          const newWeight = parseInt(document.getElementById('newWeight').value);
 
-		if (isNaN(newWeight) || newWeight <= 0) {
-		  alert("Please enter a valid weight greater than zero.");
-		  return;
-		}
+          if (!web3.utils.isAddress(voterAddress)) {
+            alert("Please enter a valid Ethereum address.");
+            return;
+          }
 
-		// Call the contract method to adjust the voter's weight
-		await ballotContract.methods.adjustVotingWeight(voterAddress, newWeight).send({ from: chairpersonAddress });
-		alert("Voter weight adjusted successfully!");
-	  } catch (error) {
-		console.error("Error adjusting voter weight: ", error);
-		alert("There was an error while adjusting the voter weight.");
-		}
-		}
+          if (isNaN(newWeight) || newWeight <= 0) {
+            alert("Please enter a valid weight greater than zero.");
+            return;
+          }
 
-	  
+          await ballotAddress.methods.adjustVotingWeight(voterAddress, newWeight).send({ from: chairpersonAddress });
+          alert("Voter weight adjusted successfully!");
+        } catch (error) {
+          console.error("Error adjusting voter weight: ", error);
+          alert("There was an error while adjusting the voter weight.");
+        }
+      }
+
+      async function updateRemainingTime() {
+        try {
+          const remainingTimeInSeconds = await ballotContract.methods.remainingTime().call();
+          const hours = Math.floor(remainingTimeInSeconds / 3600);
+          const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
+          const seconds = remainingTimeInSeconds % 60;
+          document.getElementById("remainingTime").innerText = `${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
+        } catch (error) {
+          console.error("Error fetching voting time: ", error);
+        }
+      }
+
+      async function getWinnerName() {
+        try {
+          const winnerName = await ballotContract.methods.winnerName().call();
+          alert(`The winner is: ${winnerName}`);
+        } catch (error) {
+          console.error("Error fetching winner: ", error);
+          alert("There was an error getting the winner's name.");
+        }
+      }
+
       async function getVotersInfo() {
         try {
           const votersInfo = await ballotContract.methods.getVotersInfo().call();
-
-          // Clear previous tables
           document.getElementById("votersWithRights").getElementsByTagName('tbody')[0].innerHTML = '';
           document.getElementById("votersWithRevokedRights").getElementsByTagName('tbody')[0].innerHTML = '';
 
-          // Categorize voters into two groups
           votersInfo.forEach(info => {
-            // Split the information by commas to parse it
             const voterInfo = info.split(", ");
             const address = voterInfo[0].replace("Address: ", "").trim();
             const status = voterInfo[1].replace("Status: ", "").trim();
             const weight = voterInfo[2].replace("Weight: ", "").trim();
             const delegate = voterInfo[3].replace("Delegate: ", "").trim();
 
-            // Check weight to categorize the voters
             if (weight === "Voting Rights") {
-              // Voter with voting rights (weight > 0)
               const row = `<tr>
                             <td>${address}</td>
                             <td>${status}</td>
@@ -218,57 +279,13 @@
                           </tr>`;
               document.getElementById("votersWithRights").getElementsByTagName('tbody')[0].innerHTML += row;
             } else {
-              // Voter with revoked rights (weight = 0)
-              const row = `<tr>
-                            <td>${address}</td>
-                          </tr>`;
+              const row = `<tr><td>${address}</td></tr>`;
               document.getElementById("votersWithRevokedRights").getElementsByTagName('tbody')[0].innerHTML += row;
             }
           });
         } catch (error) {
           console.error("Error fetching voters info: ", error);
           alert("There was an error fetching the voters' information.");
-        }
-      }
-      
-      async function updateRemainingTime() {
-        try {
-          const remainingTimeInSeconds = await ballotContract.methods.remainingTime().call();
-          
-          // Calculate hours, minutes, and seconds
-          const hours = Math.floor(remainingTimeInSeconds / 3600);
-          const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
-          const seconds = remainingTimeInSeconds % 60;
-          
-          // Display the remaining time in the format: "X hours, Y minutes, Z seconds"
-          const timeString = `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
-          
-          document.getElementById("remainingTime").innerText = "Time remaining: " + timeString;
-        } catch (error) {
-          console.error("Error fetching remaining time: ", error);
-          alert("There was an error fetching the remaining time.");
-        }
-      }
-
-      // Function to get the winner's name
-      async function getWinnerName() {
-        try {
-          const accounts = await web3.eth.requestAccounts();
-          const connectedAddress = accounts[0];  // Get the connected account
-          
-          // Check if the connected account is the chairperson
-          const chairpersonAddress = await ballotContract.methods.chairperson().call();
-
-          if (connectedAddress !== chairpersonAddress) {
-            alert("Only the chairperson can get the winner name.");
-            return;
-          }
-
-          const winner = await ballotContract.methods.winnerName().call(); // Use call() for view function
-          alert("The winner is: " + web3.utils.hexToUtf8(winner)); // Convert bytes32 to string
-        } catch (error) {
-          console.error("Error fetching winner: ", error);
-          alert("There was an error while fetching the winner.");
         }
       }
     </script>
