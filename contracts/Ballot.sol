@@ -183,10 +183,24 @@ contract Ballot {
         }
     }
 
-    // Get the name of the winning proposal
-    function winnerName() external view returns (bytes32 winnerName_) {
-        winnerName_ = proposals[winningProposals()].name;
-    }
+    // Function to convert bytes32 to string
+	function bytes32ToString(bytes32 _bytes32) internal pure returns (string memory) {
+		uint8 i = 0;
+		while (i < 32 && _bytes32[i] != 0) {
+			i++;
+		}
+		bytes memory byteArray = new bytes(i);
+		for (uint8 j = 0; j < i; j++) {
+			byteArray[j] = _bytes32[j];
+		}
+		return string(byteArray);
+	}
+
+	// Function to get the name of the winning proposal
+	function winnerName() external view returns (string memory winnerName_) {
+		winnerName_ = bytes32ToString(proposals[winningProposals()].name);
+	}
+
 
     // Function to get the remaining time until the voting ends (in seconds)
     function remainingTime() external view returns (uint) {

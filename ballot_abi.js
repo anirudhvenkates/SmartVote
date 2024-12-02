@@ -136,13 +136,32 @@ var ballotABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_bytes32",
+        "type": "bytes32"
+      }
+    ],
+    "name": "bytes32ToString",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "winnerName",
     "outputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "string",
         "name": "winnerName_",
-        "type": "bytes32"
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -214,72 +233,26 @@ var ballotABI = [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "voter",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "voters",
     "outputs": [
       {
-        "internalType": "struct Ballot.Voter",
+        "internalType": "mapping(address => struct Ballot.Voter)",
         "name": "",
-        "type": "tuple",
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "weight",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "voted",
-            "type": "bool"
-          },
-          {
-            "internalType": "address",
-            "name": "delegate",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "vote",
-            "type": "uint256"
-          }
-        ]
+        "type": "address"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
     "name": "proposals",
     "outputs": [
       {
-        "internalType": "struct Ballot.Proposal",
+        "internalType": "struct Ballot.Proposal[]",
         "name": "",
-        "type": "tuple",
-        "components": [
-          {
-            "internalType": "bytes32",
-            "name": "name",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "uint256",
-            "name": "voteCount",
-            "type": "uint256"
-          }
-        ]
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",

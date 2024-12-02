@@ -97,7 +97,7 @@
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
       let ballotContract;
-	  const ballotManagerAddress = "0x9367a299510Fc9FFab81CA9555CB953A02712f22"; // Replace with BallotManager contract address
+	  const ballotManagerAddress = "0x5D3b423B54FD1fACf734440e9B6834910336834B"; // Replace with BallotManager contract address
       const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
 
       // Function to fetch the ballot contract address from the BallotManager contract
@@ -139,6 +139,7 @@
 
 		  // Convert proposal names to bytes32 array (if the smart contract requires it)
 		  const proposalNamesBytes32 = proposalNames.map(p => web3.utils.asciiToHex(p));
+		  console.log(proposalNamesBytes32);
 		  
 		  // Assuming the smart contract expects proposal names as bytes32[]
 		  const accounts = await web3.eth.requestAccounts();
@@ -249,6 +250,14 @@
 
       async function getWinnerName() {
         try {
+			const accounts = await web3.eth.requestAccounts();
+          const connectedAddress = accounts[0];  
+          const chairpersonAddress = await ballotContract.methods.chairperson().call();
+
+          if (connectedAddress !== chairpersonAddress) {
+            alert("Only the chairperson can adjust voter weights.");
+            return;
+          }
           const winnerName = await ballotContract.methods.winnerName().call();
           alert(`The winner is: ${winnerName}`);
         } catch (error) {
