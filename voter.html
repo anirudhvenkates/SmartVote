@@ -63,7 +63,7 @@
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
 
-      const ballotManagerAddress = "0xB9844a952ef5242dC8B4621b0071E67a952d8BE7"; // Replace with your BallotManager contract address
+      const ballotManagerAddress = "0x5D8d6950B32f144Ed37609A4DEB0600c8Bf5827B"; // Replace with your BallotManager contract address
       const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
 
       let ballotContract; // This will hold the active Ballot contract instance

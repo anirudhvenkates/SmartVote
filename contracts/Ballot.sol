@@ -197,7 +197,8 @@ contract Ballot {
 	}
 
 	// Function to get the name of the winning proposal
-	function winnerName() external view onlyChairperson returns (string memory winnerName_) {
+	function winnerName() external view returns (string memory winnerName_) {
+		//require(block.timestamp > deadline, "Voting period has not ended yet.");
 		winnerName_ = bytes32ToString(proposals[winningProposals()].name);
 	}
 

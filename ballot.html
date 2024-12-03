@@ -113,7 +113,7 @@
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
       let ballotContract;
-	  const ballotManagerAddress = "0xB9844a952ef5242dC8B4621b0071E67a952d8BE7"; // Replace with BallotManager contract address
+	  const ballotManagerAddress = "0x5D8d6950B32f144Ed37609A4DEB0600c8Bf5827B"; // Replace with BallotManager contract address
       const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
 
       // Function to fetch the ballot contract address from the BallotManager contract
@@ -310,10 +310,11 @@
         try {
 			const accounts = await web3.eth.requestAccounts();
           const connectedAddress = accounts[0];  
+		  console.log(connectedAddress);
           const chairpersonAddress = await ballotManagerContract.methods.chairperson().call();
 
           if (connectedAddress !== chairpersonAddress) {
-            alert("Only the chairperson can adjust voter weights.");
+            alert("Only the chairperson can fetch winner names.");
             return;
           }
           const winnerName = await ballotContract.methods.winnerName().call();
