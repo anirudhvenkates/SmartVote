@@ -70,6 +70,15 @@ contract Ballot {
         }
     }
 	
+	// Function to get the list of proposal names (for display)
+	function getProposals() external view returns (string[] memory) {
+		string[] memory proposalNames = new string[](proposals.length);
+		for (uint i = 0; i < proposals.length; i++) {
+			proposalNames[i] = bytes32ToString(proposals[i].name); // Convert bytes32 to string
+		}
+		return proposalNames;
+	}
+	
 	// Function to get all voters' information in a simple array format
 	function getVotersInfo() public view returns (string[] memory) {
 		string[] memory votersInfo = new string[](voterAddresses.length);

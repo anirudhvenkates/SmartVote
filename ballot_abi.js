@@ -48,6 +48,19 @@ var ballotABI = [
   },
   {
     "inputs": [],
+    "name": "getProposals",
+    "outputs": [
+      {
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getVotersInfo",
     "outputs": [
       {
@@ -182,7 +195,20 @@ var ballotABI = [
   },
   {
     "inputs": [],
-    "name": "ballotCount",
+    "name": "chairperson",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "deadline",
     "outputs": [
       {
         "internalType": "uint256",
@@ -195,12 +221,91 @@ var ballotABI = [
   },
   {
     "inputs": [],
-    "name": "getAllBallots",
+    "name": "MAX_DELEGATION_DEPTH",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "voterAddresses",
     "outputs": [
       {
         "internalType": "address[]",
         "name": "",
         "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "voters",
+    "outputs": [
+      {
+        "internalType": "struct Ballot.Voter",
+        "name": "",
+        "type": "tuple",
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "weight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "voted",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "delegate",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "vote",
+            "type": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proposals",
+    "outputs": [
+      {
+        "internalType": "struct Ballot.Proposal[]",
+        "name": "",
+        "type": "tuple[]",
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "name",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "voteCount",
+            "type": "uint256"
+          }
+        ]
       }
     ],
     "stateMutability": "view",

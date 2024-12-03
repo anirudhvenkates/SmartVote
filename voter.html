@@ -41,10 +41,8 @@
     </div>
 	
     <h1>Vote for your favorite proposal!</h1>
-    <div>
-      <button onclick="vote(0)">Vote for Proposal 1</button>
-      <button onclick="vote(1)">Vote for Proposal 2</button>
-      <button onclick="vote(2)">Vote for Proposal 3</button>
+    <div id="proposals-container">
+      <!-- Dynamic proposal buttons will be inserted here -->
     </div>
 
     <h1>Delegate Your Vote</h1>
@@ -63,19 +61,19 @@
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
 
-      const ballotManagerAddress = "0x5D8d6950B32f144Ed37609A4DEB0600c8Bf5827B"; // Replace with your BallotManager contract address
+      const ballotManagerAddress = "0x563aa8f2D1D4ca19673282828B9966635A099975"; // Replace with your BallotManager contract address
       const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
 
       let ballotContract; // This will hold the active Ballot contract instance
 
       // Function to fetch the address of the active ballot from BallotManager
       async function getBallotAddress() {
-		const ballotIdInput = document.getElementById("ballotIdInput").value;
-		if (!ballotIdInput) {
-			alert("Please enter a valid ballot ID.");
-			return;
-		}
-		
+        const ballotIdInput = document.getElementById("ballotIdInput").value;
+        if (!ballotIdInput) {
+          alert("Please enter a valid ballot ID.");
+          return;
+        }
+
         try {
           const ballotAddress = await ballotManagerContract.methods.getBallotAddress(ballotIdInput).call();
           if (ballotAddress === "0x0000000000000000000000000000000000000000") {
@@ -83,11 +81,42 @@
             return null;
           }
           ballotContract = new web3.eth.Contract(ballotABI, ballotAddress);
-		  alert(`Ballot contract set to: ${ballotAddress}`);
+          alert(`Ballot contract set to: ${ballotAddress}`);
           console.log("Ballot contract set to:", ballotAddress);
+          
+          // Load proposals after setting ballot address
+          loadProposals();
         } catch (error) {
           console.error("Error fetching ballot address:", error);
           alert("There was an error fetching the ballot address.");
+        }
+      }
+
+      // Function to load proposals and generate vote buttons dynamically
+      async function loadProposals() {
+        if (!ballotContract) {
+          alert("Please load a ballot first.");
+          return;
+        }
+
+        try {
+          // Fetch the list of proposal names from the contract
+          const proposalNames = await ballotContract.methods.getProposals().call();
+          const proposalsContainer = document.getElementById("proposals-container");
+          proposalsContainer.innerHTML = "";  // Clear previous proposals
+
+          // Create buttons dynamically for each proposal
+          proposalNames.forEach((proposalName, index) => {
+            const button = document.createElement("button");
+            button.innerText = `Vote for ${proposalName}`;
+            button.onclick = function() {
+              vote(index);  // Pass proposal index to vote function
+            };
+            proposalsContainer.appendChild(button);
+          });
+        } catch (error) {
+          console.error("Error loading proposals:", error);
+          alert("There was an error loading proposals.");
         }
       }
 
