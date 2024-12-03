@@ -182,20 +182,7 @@ var ballotABI = [
   },
   {
     "inputs": [],
-    "name": "chairperson",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "deadline",
+    "name": "ballotCount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -208,51 +195,12 @@ var ballotABI = [
   },
   {
     "inputs": [],
-    "name": "MAX_DELEGATION_DEPTH",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "voterAddresses",
+    "name": "getAllBallots",
     "outputs": [
       {
         "internalType": "address[]",
         "name": "",
         "type": "address[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "voters",
-    "outputs": [
-      {
-        "internalType": "mapping(address => struct Ballot.Voter)",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "proposals",
-    "outputs": [
-      {
-        "internalType": "struct Ballot.Proposal[]",
-        "name": "",
-        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -293,6 +241,24 @@ var ballotManagerABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getAllBallots",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes32[]",
@@ -318,25 +284,6 @@ var ballotManagerABI = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "ballotId",
-        "type": "uint256"
-      }
-    ],
-    "name": "ballotToContract",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",

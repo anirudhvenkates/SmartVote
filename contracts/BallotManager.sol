@@ -29,4 +29,17 @@ contract BallotManager {
     function getBallotAddress(uint ballotId) external view returns (address) {
         return ballotToContract[ballotId];
     }
+	
+	// Function to get all ballots with their ballot ID and address
+    function getAllBallots() external view returns (uint[] memory, address[] memory) {
+        uint[] memory ids = new uint[](ballotCount);
+        address[] memory addresses = new address[](ballotCount);
+        
+        for (uint i = 0; i < ballotCount; i++) {
+            ids[i] = i;
+            addresses[i] = ballotToContract[i];
+        }
+
+        return (ids, addresses);
+    }
 }
