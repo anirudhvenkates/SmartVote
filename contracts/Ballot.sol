@@ -206,9 +206,17 @@ contract Ballot {
 	}
 
 	// Function to get the name of the winning proposal
-	function winnerName() external view returns (string memory winnerName_) {
+	function winnerName() external view returns (string memory winnerName_,string[] memory proposalNames, uint[] memory voteCounts) {
 		//require(block.timestamp > deadline, "Voting period has not ended yet.");
 		winnerName_ = bytes32ToString(proposals[winningProposals()].name);
+		
+		proposalNames = new string[](proposals.length);
+        voteCounts = new uint[](proposals.length);
+
+        for (uint i = 0; i < proposals.length; i++) {
+            proposalNames[i] = bytes32ToString(proposals[i].name); // Convert bytes32 to string
+            voteCounts[i] = proposals[i].voteCount;
+        }
 	}
 
 

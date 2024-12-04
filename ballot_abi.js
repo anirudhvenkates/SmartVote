@@ -175,6 +175,16 @@ var ballotABI = [
         "internalType": "string",
         "name": "winnerName_",
         "type": "string"
+      },
+      {
+        "internalType": "string[]",
+        "name": "proposalNames",
+        "type": "string[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "voteCounts",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",
@@ -249,7 +259,7 @@ var ballotABI = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "voter",
         "type": "address"
       }
     ],

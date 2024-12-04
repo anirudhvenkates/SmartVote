@@ -72,6 +72,15 @@
     </div>
     
     <h1>Declare Winner</h1>
+	<table id="winnerProposalsTable">
+	  <thead>
+		<tr>
+		  <th>Proposal Name</th>
+		  <th>Vote Count</th>
+		</tr>
+	  </thead>
+	  <tbody></tbody>
+	</table><br></br>
     <div>
       <button onclick="getWinnerName()">Get Winner Name</button>
     </div>
@@ -113,7 +122,7 @@
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
       let ballotContract;
-	  const ballotManagerAddress = "0x563aa8f2D1D4ca19673282828B9966635A099975"; // Replace with BallotManager contract address
+	  const ballotManagerAddress = "0x5EE76949B78735C4Fcfc7AC8aaed901203aE0534"; // Replace with BallotManager contract address
       const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
 
       // Function to fetch the ballot contract address from the BallotManager contract
@@ -307,23 +316,49 @@
       }
 
       async function getWinnerName() {
-        try {
-			const accounts = await web3.eth.requestAccounts();
-          const connectedAddress = accounts[0];  
-		  console.log(connectedAddress);
-          const chairpersonAddress = await ballotManagerContract.methods.chairperson().call();
+    try {
+        const accounts = await web3.eth.requestAccounts();
+        const connectedAddress = accounts[0];
+        const chairpersonAddress = await ballotManagerContract.methods.chairperson().call();
 
-          if (connectedAddress !== chairpersonAddress) {
+        if (connectedAddress !== chairpersonAddress) {
             alert("Only the chairperson can fetch winner names.");
             return;
-          }
-          const winnerName = await ballotContract.methods.winnerName().call();
-          alert(`The winner is: ${winnerName}`);
-        } catch (error) {
-          console.error("Error fetching winner: ", error);
-          alert("There was an error getting the winner's name.");
         }
-      }
+
+        const winnerArray = await ballotContract.methods.winnerName().call();
+        const winnerName = winnerArray[0]; // Winner's name
+
+        // Extract proposal names and vote counts
+        const proposalNames = winnerArray[1];  // Array of proposal names
+        const voteCounts = winnerArray[2];     // Array of vote counts
+
+        // Display winner's name
+        alert(`The winner is: ${winnerName}`);
+
+        // Populate the table with proposals and their vote counts
+        const tableBody = document.getElementById("winnerProposalsTable").getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = ''; // Clear the table before adding new rows
+
+        // Loop through each proposal and create a row in the table
+        for (let i = 0; i < proposalNames.length; i++) {
+            const row = document.createElement("tr");
+
+            const proposalNameCell = document.createElement("td");
+            proposalNameCell.innerText = proposalNames[i]; // Convert from bytes32 to string
+            row.appendChild(proposalNameCell);
+
+            const voteCountCell = document.createElement("td");
+            voteCountCell.innerText = voteCounts[i];
+            row.appendChild(voteCountCell);
+
+            tableBody.appendChild(row);
+        }
+		} catch (error) {
+			console.error("Error fetching winner: ", error);
+			alert("There was an error getting the winner's name.");
+		}
+	}
 
       async function getVotersInfo() {
         try {
