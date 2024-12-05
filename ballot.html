@@ -131,11 +131,34 @@
     </footer>
 
     <script>
-      const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
       let ballotContract;
 	  let ballotID=0;
-	  const ballotManagerAddress = "0x8a6a7ab73968dEE33E295275E91B80a926313AE4"; // Replace with BallotManager contract address
-      const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
+	  let ballotManagerContract;
+	  let web3;
+	  
+	  async function loadContractAddress() {
+			if (typeof window.ethereum !== 'undefined') {
+			
+			web3 = new Web3(window.ethereum);
+			try {
+				const response = await fetch('public/contract_address.json');
+				const data = await response.json();
+				const ballotManagerAddress = data.contractAddress;
+
+				const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
+				ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
+				console.log('Contract Address:', ballotManagerAddress);
+			} catch (error) {
+				console.error("Error loading contract address: ", error);
+			}
+		} else {
+        console.log('MetaMask not detected!');
+        // If MetaMask is not detected, you can fallback to a local provider like Ganache (for development)
+        web3 = new Web3("http://localhost:7545"); // Replace with your local provider
+        const ballotManagerAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with your actual contract address
+        ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
+		}
+		}
 
       // Function to fetch the ballot contract address from the BallotManager contract
       async function getBallotAddress() {
@@ -374,6 +397,7 @@
 			alert("There was an error fetching the voters' information.");
 		}
 	}
+	loadContractAddress();
     </script>
   </body>
 </html>

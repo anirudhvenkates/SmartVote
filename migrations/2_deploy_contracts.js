@@ -1,5 +1,7 @@
 var Ballot = artifacts.require("./Ballot.sol");
 var BallotManager = artifacts.require("./BallotManager.sol");
+const fs = require('fs');
+const path = require('path');
 
 module.exports = function(deployer, network, accounts) {
     // Deploy the BallotManager contract first
@@ -18,6 +20,15 @@ module.exports = function(deployer, network, accounts) {
         await ballotManagerInstance.createBallot(proposalNames, votingDurationInSeconds);
 
         // Optionally, if you want to confirm the Ballot address
-        await ballotManagerInstance.getBallotAddress(0);
+        const ballotAddress = await ballotManagerInstance.getBallotAddress(0);
+        console.log("Deployed BallotManager contract address:", ballotManagerInstance.address);
+
+        // Save the BallotManager contract address to a JSON file
+        //const contractAddressPath = path.join(__dirname, '../public/contract_address.json');
+		const contractAddressPath = path.join(process.cwd(), 'public', 'contract_address.json');
+        const contractAddressData = JSON.stringify({ contractAddress: ballotManagerInstance.address }, null, 2);
+        
+        fs.writeFileSync(contractAddressPath, contractAddressData);
+        console.log('Contract address saved to contract_address.json');
     });
 };
