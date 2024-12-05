@@ -103,7 +103,7 @@
             <tr>
               <th>Address</th>
               <th>Status</th>
-              <th>Weight</th>
+              <th>Eligibility</th>
               <th>Delegate Address</th>
             </tr>
           </thead>
@@ -133,7 +133,8 @@
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
       let ballotContract;
-	  const ballotManagerAddress = "0xb79344eeFdC8F49A15E90B2c45a6FebD0Ff533e7"; // Replace with BallotManager contract address
+	  let ballotID=0;
+	  const ballotManagerAddress = "0x8a6a7ab73968dEE33E295275E91B80a926313AE4"; // Replace with BallotManager contract address
       const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
 
       // Function to fetch the ballot contract address from the BallotManager contract
@@ -190,8 +191,12 @@
 				  alert("Only the chairperson can grant voting rights.");
 				  return;
 				}
-			await ballotManagerContract.methods.createBallot(proposalNamesBytes32, votingDurationInSeconds).send({ from: chairpersonAddress });
-			alert("New ballot created!");
+			const receipt = await ballotManagerContract.methods.createBallot(proposalNamesBytes32, votingDurationInSeconds).send({ from: chairpersonAddress });
+			console.log(receipt);
+			
+			// Listen for the BallotCreated event
+			ballotID = ballotID + 1; 
+			alert(`New ballot created with Ballot ID: ${ballotID}`);
 		  } catch (error) {
 			console.error("Error creating ballot:", error);
 			alert("There was an error creating the ballot.");
