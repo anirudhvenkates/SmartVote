@@ -1,128 +1,139 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartVote Ballot</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="ballot_abi.js"></script>
-    <style>
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      th, td {
-        padding: 8px;
-        text-align: left;
-        border: 1px solid #ddd;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
-    </style>
+    <link rel="stylesheet" href="ballot_styles.css">
+    <link rel="icon" href="favicon.png" type="image/png">
   </head>
   <body>
-  <h1>Create a New Ballot</h1>
-    <form id="createBallotForm">
-      <label for="proposalNames">Proposals (comma separated):</label><br>
-      <input type="text" id="proposalNames" placeholder="Enter proposal names"><br><br>
+    <!-- Header Section -->
+    <header>
+      <div class="logo-container">
+        <img src="logo.svg" alt="SmartVote Logo" class="logo">
+        <h1>SmartVote Voting System</h1>
+      </div>
+      <a href="index.html" class="home-link"><i class="fas fa-home"></i> Home</a>
+      <h1><i class="fas fa-vote-yea"></i> Ballot Page</h1>
+    </header>
+
+    <!-- Main Content -->
+    <div class="voter-content">
       
-      <label for="votingDuration">Voting Duration (in seconds):</label><br>
-      <input type="number" id="votingDuration" placeholder="Enter duration in seconds"><br><br>
+      <!-- Create Ballot Section -->
+      <div class="card">
+        <h2><i class="fas fa-vote-yea"></i> Create a New Ballot</h2>
+        <form id="createBallotForm">
+          <label for="proposalNames">Proposals (comma separated):</label>
+          <input type="text" id="proposalNames" placeholder="Enter proposal names">
+          
+          <label for="votingDuration">Voting Duration (in seconds):</label>
+          <input type="number" id="votingDuration" placeholder="Enter duration in seconds">
 
-      <button type="button" onclick="createBallot()">Create Ballot</button>
-    </form>
-	
-	<h1>All Ballots</h1>
-    <div>
-      <button onclick="loadAllBallots()">Load All Ballots</button>
+          <button type="button" onclick="createBallot()">Create Ballot</button>
+        </form>
+      </div>
+
+      <!-- Load Ballot Section -->
+      <div class="card">
+        <h2><i class="fas fa-clipboard-check"></i> Enter Ballot ID</h2>
+        <input type="text" id="ballotIdInput" placeholder="Enter ballot ID">
+        <button onclick="getBallotAddress()">Load Ballot</button>
+      </div>
+
+      <!-- Grant Voting Rights Section -->
+      <div class="card">
+        <h2><i class="fas fa-user-check"></i> Grant Voting Rights</h2>
+        <textarea id="votersList" placeholder="Enter addresses separated by commas"></textarea><br>
+        <button onclick="grantVotingRights()">Grant Voting Rights</button>
+      </div>
+
+      <!-- Revoke Voting Rights Section -->
+      <div class="card">
+        <h2><i class="fas fa-user-times"></i> Revoke Voting Rights</h2>
+        <textarea id="revokeVotersList" placeholder="Enter addresses separated by commas"></textarea><br>
+        <button onclick="revokeVotingRights()">Revoke Voting Rights</button>
+      </div>
+
+      <!-- Adjust Voter Weight Section -->
+      <div class="card">
+        <h2><i class="fas fa-weight-hanging"></i> Adjust Voter Weight</h2>
+        <input type="text" id="voterAddress" placeholder="Enter voter's address">
+        <input type="number" id="newWeight" placeholder="Enter new weight">
+        <button onclick="adjustVoterWeight()">Adjust Weight</button>
+      </div>
+
+      <!-- Declare Winner Section -->
+      <div class="card">
+        <h2><i class="fas fa-trophy"></i> Declare Winner</h2>
+        <table id="winnerProposalsTable">
+          <thead>
+            <tr>
+              <th>Proposal Name</th>
+              <th>Vote Count</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button onclick="getWinnerName()">Get Winner</button>
+      </div>
+
+      <!-- Voting Time Remaining Section -->
+      <div class="card">
+        <h2><i class="fas fa-clock"></i> Voting Time Remaining</h2>
+        <p id="remainingTime">Click to load remaining time...</p>
+        <button onclick="updateRemainingTime()">Check Remaining Time</button>
+      </div>
+
+      <!-- Voter Information Section -->
+      <div class="card">
+        <h2><i class="fas fa-users"></i> Voters Information</h2>
+        <button onclick="getVotersInfo()">Get Voters Info</button>
+      </div>
+
+      <!-- Voters with Voting Rights Section -->
+      <div class="card">
+        <h2><i class="fas fa-user-check"></i> Voters with Voting Rights</h2>
+        <table id="votersWithRights">
+          <thead>
+            <tr>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Weight</th>
+              <th>Delegate Address</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Voters with Revoked Rights Section -->
+      <div class="card">
+        <h2><i class="fas fa-user-times"></i> Voters with Revoked Rights</h2>
+        <table id="votersWithRevokedRights">
+          <thead>
+            <tr>
+              <th>Address</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
 
-    <h2>Ballots List</h2>
-    <table id="ballotsList">
-      <thead>
-        <tr>
-          <th>Ballot ID</th>
-          <th>Ballot Address</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <h1>Enter Ballot ID</h1>
-    <div>
-      <input type="text" id="ballotIdInput" placeholder="Enter ballot ID" /><br><br>
-      <button onclick="getBallotAddress()">Load Ballot</button>
-    </div>
-    
-    <h1>Grant Voting Rights</h1>
-    <div>
-      <textarea id="votersList" placeholder="Enter addresses separated by commas"></textarea><br><br>
-      <button onclick="grantVotingRights()">Grant Voting Rights</button>
-    </div>
-    
-    <div>
-      <h3>Revoke Voting Rights</h3>
-      <textarea id="revokeVotersList" placeholder="Enter addresses separated by commas"></textarea><br><br>
-      <button onclick="revokeVotingRights()">Revoke Voting Rights</button>
-    </div>
-    
-    <h1>Adjust Voter Weight</h1>
-    <div>
-      <input type="text" id="voterAddress" placeholder="Enter voter's address" /><br><br>
-      <input type="number" id="newWeight" placeholder="Enter new weight" /><br><br>
-      <button onclick="adjustVoterWeight()">Adjust Voter Weight</button>
-    </div>
-    
-    <h1>Declare Winner</h1>
-	<table id="winnerProposalsTable">
-	  <thead>
-		<tr>
-		  <th>Proposal Name</th>
-		  <th>Vote Count</th>
-		</tr>
-	  </thead>
-	  <tbody></tbody>
-	</table><br></br>
-    <div>
-      <button onclick="getWinnerName()">Get Winner Name</button>
-    </div>
-    
-    <h1>Voting Time Remaining</h1>
-    <div>
-      <p id="remainingTime">Click to load remaining time...</p>
-      <button onclick="updateRemainingTime()">Check Remaining Time</button>
-    </div>
-    
-    <h1>Voters Information</h1>
-    <div>
-      <button onclick="getVotersInfo()">Get Voters Info</button>
-    </div>
-    
-    <h2>Voters with Voting Rights</h2>
-    <table id="votersWithRights">
-      <thead>
-        <tr>
-          <th>Address</th>
-          <th>Status</th>
-          <th>Weight</th>
-          <th>Delegate Address</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <h2>Voters with Revoked Rights</h2>
-    <table id="votersWithRevokedRights">
-      <thead>
-        <tr>
-          <th>Address</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <!-- Footer Section -->
+    <footer>
+      <p>© 2024 Voting System. All rights reserved.</p>
+    </footer>
 
     <script>
       const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
       let ballotContract;
-	  const ballotManagerAddress = "0x5EE76949B78735C4Fcfc7AC8aaed901203aE0534"; // Replace with BallotManager contract address
+	  const ballotManagerAddress = "0xb79344eeFdC8F49A15E90B2c45a6FebD0Ff533e7"; // Replace with BallotManager contract address
       const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
 
       // Function to fetch the ballot contract address from the BallotManager contract
@@ -148,40 +159,6 @@
         } catch (error) {
           console.error("Error fetching ballot address:", error);
           alert("There was an error fetching the ballot.");
-        }
-      }
-	  
-	  // Function to load and display all ballots (IDs and addresses)
-      async function loadAllBallots() {
-        try {
-          //const [ballotIds, ballotAddresses] = await ballotManagerContract.methods.getAllBallots().call();
-		  const result = await ballotManagerContract.methods.getAllBallots().call();
-		  
-		  // Access the arrays within the nested object
-		  const ballotIds = result[0];      // Array of ballot IDs
-		  const ballotAddresses = result[1]; // Array of ballot addresses
-		  
-          // Clear the current list in the table
-          const tableBody = document.getElementById("ballotsList").getElementsByTagName("tbody")[0];
-          tableBody.innerHTML = '';
-
-          // Populate the table with the ballot data
-          for (let i = 1; i < ballotIds.length; i++) {
-            const row = document.createElement("tr");
-
-            const ballotIdCell = document.createElement("td");
-            ballotIdCell.innerText = ballotIds[i];
-            row.appendChild(ballotIdCell);
-
-            const ballotAddressCell = document.createElement("td");
-            ballotAddressCell.innerText = ballotAddresses[i];
-            row.appendChild(ballotAddressCell);
-
-            tableBody.appendChild(row);
-          }
-        } catch (error) {
-          console.error("Error loading ballots: ", error);
-          alert("There was an error loading the ballots.");
         }
       }
 	  
@@ -361,36 +338,37 @@
 	}
 
       async function getVotersInfo() {
-        try {
-          const votersInfo = await ballotContract.methods.getVotersInfo().call();
-          document.getElementById("votersWithRights").getElementsByTagName('tbody')[0].innerHTML = '';
-          document.getElementById("votersWithRevokedRights").getElementsByTagName('tbody')[0].innerHTML = '';
+		try {
+			const votersInfo = await ballotContract.methods.getVotersInfo().call();
+			document.getElementById("votersWithRights").getElementsByTagName('tbody')[0].innerHTML = '';
+			document.getElementById("votersWithRevokedRights").getElementsByTagName('tbody')[0].innerHTML = '';
 
-          votersInfo.forEach(info => {
-            const voterInfo = info.split(", ");
-            const address = voterInfo[0].replace("Address: ", "").trim();
-            const status = voterInfo[1].replace("Status: ", "").trim();
-            const weight = voterInfo[2].replace("Weight: ", "").trim();
-            const delegate = voterInfo[3].replace("Delegate: ", "").trim();
+			votersInfo.forEach(info => {
+				const voterInfo = info.split(", ");
+				const address = voterInfo[0].replace("Address: ", "").trim();
+				const status = voterInfo[1].replace("Status: ", "").trim();
+				const weight = voterInfo[2].replace("Weight: ", "").trim();
+				const delegate = voterInfo[3].replace("Delegate: ", "").trim();
 
-            if (weight === "Voting Rights") {
-              const row = `<tr>
-                            <td>${address}</td>
-                            <td>${status}</td>
-                            <td>${weight}</td>
-                            <td>${delegate}</td>
-                          </tr>`;
-              document.getElementById("votersWithRights").getElementsByTagName('tbody')[0].innerHTML += row;
-            } else {
-              const row = `<tr><td>${address}</td></tr>`;
-              document.getElementById("votersWithRevokedRights").getElementsByTagName('tbody')[0].innerHTML += row;
-            }
-          });
-        } catch (error) {
-          console.error("Error fetching voters info: ", error);
-          alert("There was an error fetching the voters' information.");
-        }
-      }
+				if (weight === "Voting Rights") {
+					const row = `
+						<tr>
+							<td><strong>${address}</strong></td>
+							<td>${status}</td>
+							<td>${weight}</td>
+							<td>${delegate}</td>
+						</tr>`;
+					document.getElementById("votersWithRights").getElementsByTagName('tbody')[0].innerHTML += row;
+				} else {
+					const row = `<tr><td><strong>${address}</strong></td></tr>`;
+					document.getElementById("votersWithRevokedRights").getElementsByTagName('tbody')[0].innerHTML += row;
+				}
+			});
+		} catch (error) {
+			console.error("Error fetching voters info: ", error);
+			alert("There was an error fetching the voters' information.");
+		}
+	}
     </script>
   </body>
 </html>

@@ -1,189 +1,203 @@
-<html>
-  <head>
-    <title>SmartVote Voting</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
-    <script src="ballot_abi.js"></script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
-      h1 {
-        color: #4CAF50;
-      }
-      button {
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        margin: 10px;
-      }
-      button:hover {
-        background-color: #45a049;
-      }
-      input[type="text"] {
-        padding: 10px;
-        width: 250px;
-        margin: 10px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-      }
-      #remainingTime {
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Enter Ballot ID</h1>
-    <div>
-      <input type="text" id="ballotIdInput" placeholder="Enter ballot ID" /><br><br>
-      <button onclick="getBallotAddress()">Load Ballot</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartVote Voting</title>
+  <link rel="stylesheet" href="voter_styles.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+  <script src="ballot_abi.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="logo.svg" alt="SmartVote Logo" class="logo">
+      <h1>SmartVote Voting System</h1>
     </div>
-	
-    <h1>Vote for your favorite proposal!</h1>
-    <div id="proposals-container">
-      <!-- Dynamic proposal buttons will be inserted here -->
+    <a href="index.html" class="home-link"><i class="fas fa-home"></i> Home</a>
+    <h1><i class="fas fa-vote-yea"></i> Voter Page</h1>
+  </header>
+
+    <!-- Ballot ID Section Card -->
+    <div class="card">
+      <section>
+        <h2><i class="fas fa-user-circle"></i> Please Enter the Ballot ID</h2>
+        <input type="text" id="ballotIdInput" placeholder="Enter ballot ID" />
+        <button onclick="getBallotAddress()">Load Ballot</button>
+      </section>
     </div>
 
-    <h1>Delegate Your Vote</h1>
-    <div>
-        <h3>Delegate Vote</h3>
-        <input type="text" id="delegateTo" placeholder="Enter address to delegate to" /><br><br>
+    <!-- Voting Section Card -->
+    <div class="card">
+      <section>
+        <h2><i class="fas fa-check-circle"></i> Vote for Your Favorite Proposal</h2>
+        <div id="proposals-container">
+          <!-- Dynamic proposal buttons will be inserted here -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Delegate Vote Section Card -->
+    <div class="card">
+      <section>
+        <h2><i class="fas fa-user-tie"></i> Delegate Your Vote</h2>
+        <input type="text" id="delegateTo" placeholder="Enter address to delegate to" />
         <button onclick="delegateVote()">Delegate Vote</button>
+      </section>
     </div>
 
-    <h1>Voting Time Remaining</h1>
-    <div>
-      <p id="remainingTime">Click to load remaining time...</p>
-      <button onclick="updateRemainingTime()">Check Remaining Time</button>
+    <!-- Remaining Time Section Card -->
+    <div class="card">
+      <section>
+        <h2><i class="fas fa-clock"></i> Voting Time Remaining</h2>
+        <p id="remainingTime">Click to load remaining time...</p>
+        <button onclick="updateRemainingTime()">Check Remaining Time</button>
+      </section>
     </div>
-    
-    <script>
-      const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
 
-      const ballotManagerAddress = "0x5EE76949B78735C4Fcfc7AC8aaed901203aE0534"; // Replace with your BallotManager contract address
-      const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
+    <!-- Loading Message -->
+    <div id="loadingMessage" style="display:none;">Loading...</div>
+    <div id="spinner" class="spinner" style="display:none;"></div> <!-- Spinner for loading -->
 
-      let ballotContract; // This will hold the active Ballot contract instance
+  <footer>
+    <p>© 2024 Voting System. All rights reserved.</p>
+  </footer>
 
-      // Function to fetch the address of the active ballot from BallotManager
-      async function getBallotAddress() {
-        const ballotIdInput = document.getElementById("ballotIdInput").value;
-        if (!ballotIdInput) {
-          alert("Please enter a valid ballot ID.");
+  <script>
+    // JavaScript for handling the contract interaction (same as before)
+    const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
+    const ballotManagerAddress = "0xb79344eeFdC8F49A15E90B2c45a6FebD0Ff533e7"; // Replace with your BallotManager contract address
+    const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
+
+    let ballotContract; // This will hold the active Ballot contract instance
+
+    // Function to fetch the address of the active ballot from BallotManager
+    async function getBallotAddress() {
+      const ballotIdInput = document.getElementById("ballotIdInput").value;
+      if (!ballotIdInput) {
+        alert("Please enter a valid ballot ID.");
+        return;
+      }
+
+      try {
+        // Show loading spinner
+        document.getElementById('spinner').style.display = 'block';
+        document.getElementById('loadingMessage').style.display = 'block';
+        const ballotAddress = await ballotManagerContract.methods.getBallotAddress(ballotIdInput).call();
+        if (ballotAddress === "0x0000000000000000000000000000000000000000") {
+          alert("No active ballot found for the provided ID.");
+          return null;
+        }
+        ballotContract = new web3.eth.Contract(ballotABI, ballotAddress);
+        alert(`Ballot contract set to: ${ballotAddress}`);
+        console.log("Ballot contract set to:", ballotAddress);
+
+        // Load proposals after setting ballot address
+        loadProposals();
+        
+        // Hide loading spinner
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('loadingMessage').style.display = 'none';
+      } catch (error) {
+        console.error("Error fetching ballot address:", error);
+        alert("There was an error fetching the ballot address.");
+      }
+    }
+
+    // Function to load proposals and generate vote buttons dynamically
+    async function loadProposals() {
+      if (!ballotContract) {
+        alert("Please load a ballot first.");
+        return;
+      }
+
+      try {
+        // Fetch the list of proposal names from the contract
+        const proposalNames = await ballotContract.methods.getProposals().call();
+        const proposalsContainer = document.getElementById("proposals-container");
+        proposalsContainer.innerHTML = "";  // Clear previous proposals
+
+        // Create buttons dynamically for each proposal
+        proposalNames.forEach((proposalName, index) => {
+          const button = document.createElement("button");
+          button.innerText = `Vote for ${proposalName}`;
+          button.onclick = function() {
+            vote(index);  // Pass proposal index to vote function
+          };
+          proposalsContainer.appendChild(button);
+        });
+      } catch (error) {
+        console.error("Error loading proposals:", error);
+        alert("There was an error loading proposals.");
+      }
+    }
+
+    // Function to check the remaining time for voting
+    async function updateRemainingTime() {
+      if (!ballotContract) {
+        alert("Please load a ballot first.");
+        return;
+      }
+      try {
+        const remainingTimeInSeconds = await ballotContract.methods.remainingTime().call();
+
+        // Calculate hours, minutes, and seconds
+        const hours = Math.floor(remainingTimeInSeconds / 3600);
+        const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
+        const seconds = remainingTimeInSeconds % 60;
+
+        // Display the remaining time in the format: "X hours, Y minutes, Z seconds"
+        const timeString = `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+
+        document.getElementById("remainingTime").innerText = "Time remaining: " + timeString;
+      } catch (error) {
+        console.error("Error fetching remaining time: ", error);
+        alert("There was an error fetching the remaining time.");
+      }
+    }
+
+    // Function to cast a vote for a proposal
+    async function vote(proposalIndex) {
+      if (!ballotContract) {
+        alert("Please load a ballot first.");
+        return;
+      }
+      try {
+        const accounts = await web3.eth.requestAccounts();
+        const account = accounts[0];
+        await ballotContract.methods.vote(proposalIndex).send({ from: account });
+        alert("Vote has been cast!");
+      } catch (error) {
+        console.error("Error casting vote: ", error);
+        alert("There was an error while casting your vote.");
+      }
+    }
+
+    // Function to delegate a vote to another address
+    async function delegateVote() {
+      if (!ballotContract) {
+        alert("Please load a ballot first.");
+        return;
+      }
+      try {
+        const accounts = await web3.eth.requestAccounts();
+        const account = accounts[0];
+        const delegateToAddress = document.getElementById("delegateTo").value;
+
+        if (!web3.utils.isAddress(delegateToAddress)) {
+          alert("Please enter a valid Ethereum address.");
           return;
         }
 
-        try {
-          const ballotAddress = await ballotManagerContract.methods.getBallotAddress(ballotIdInput).call();
-          if (ballotAddress === "0x0000000000000000000000000000000000000000") {
-            alert("No active ballot found for the provided ID.");
-            return null;
-          }
-          ballotContract = new web3.eth.Contract(ballotABI, ballotAddress);
-          alert(`Ballot contract set to: ${ballotAddress}`);
-          console.log("Ballot contract set to:", ballotAddress);
-          
-          // Load proposals after setting ballot address
-          loadProposals();
-        } catch (error) {
-          console.error("Error fetching ballot address:", error);
-          alert("There was an error fetching the ballot address.");
-        }
+        await ballotContract.methods.delegate(delegateToAddress).send({ from: account });
+        alert("Vote delegated to: " + delegateToAddress);
+      } catch (error) {
+        console.error("Error delegating vote: ", error);
+        alert("There was an error while delegating the vote.");
       }
-
-      // Function to load proposals and generate vote buttons dynamically
-      async function loadProposals() {
-        if (!ballotContract) {
-          alert("Please load a ballot first.");
-          return;
-        }
-
-        try {
-          // Fetch the list of proposal names from the contract
-          const proposalNames = await ballotContract.methods.getProposals().call();
-          const proposalsContainer = document.getElementById("proposals-container");
-          proposalsContainer.innerHTML = "";  // Clear previous proposals
-
-          // Create buttons dynamically for each proposal
-          proposalNames.forEach((proposalName, index) => {
-            const button = document.createElement("button");
-            button.innerText = `Vote for ${proposalName}`;
-            button.onclick = function() {
-              vote(index);  // Pass proposal index to vote function
-            };
-            proposalsContainer.appendChild(button);
-          });
-        } catch (error) {
-          console.error("Error loading proposals:", error);
-          alert("There was an error loading proposals.");
-        }
-      }
-
-      // Function to check the remaining time for voting
-      async function updateRemainingTime() {
-        if (!ballotContract) {
-          alert("Please load a ballot first.");
-          return;
-        }
-        try {
-          const remainingTimeInSeconds = await ballotContract.methods.remainingTime().call();
-
-          // Calculate hours, minutes, and seconds
-          const hours = Math.floor(remainingTimeInSeconds / 3600);
-          const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
-          const seconds = remainingTimeInSeconds % 60;
-
-          // Display the remaining time in the format: "X hours, Y minutes, Z seconds"
-          const timeString = `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
-
-          document.getElementById("remainingTime").innerText = "Time remaining: " + timeString;
-        } catch (error) {
-          console.error("Error fetching remaining time: ", error);
-          alert("There was an error fetching the remaining time.");
-        }
-      }
-
-      // Function to cast a vote for a proposal
-      async function vote(proposalIndex) {
-        if (!ballotContract) {
-          alert("Please load a ballot first.");
-          return;
-        }
-        try {
-          const accounts = await web3.eth.requestAccounts();
-          const account = accounts[0];
-          await ballotContract.methods.vote(proposalIndex).send({ from: account });
-          alert("Vote has been cast!");
-        } catch (error) {
-          console.error("Error casting vote: ", error);
-          alert("There was an error while casting your vote.");
-        }
-      }
-
-      // Function to delegate a vote to another address
-      async function delegateVote() {
-        if (!ballotContract) {
-          alert("Please load a ballot first.");
-          return;
-        }
-        try {
-          const accounts = await web3.eth.requestAccounts();
-          const account = accounts[0];
-          const delegateToAddress = document.getElementById("delegateTo").value;
-
-          if (!web3.utils.isAddress(delegateToAddress)) {
-            alert("Please enter a valid Ethereum address.");
-            return;
-          }
-
-          await ballotContract.methods.delegate(delegateToAddress).send({ from: account });
-          alert("Vote delegated to: " + delegateToAddress);
-        } catch (error) {
-          console.error("Error delegating vote: ", error);
-          alert("There was an error while delegating the vote.");
-        }
-      }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
