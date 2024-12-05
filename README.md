@@ -1,253 +1,145 @@
 # SmartVote
-"Secure Your Vote, Secure Your Future"
+> **Secure Your Vote, Secure Your Future**
 
-##Author
+## Author
 **Anirudh Venkatesh**
 
-##Project Description
-*SmartVote* is envisioned to be a voting platform based on Smart Contracts. The project is designed for operators to conduct voting procedure through Smart Contracts.
+## Project Description
+*SmartVote* is a voting platform based on **Smart Contracts** designed for secure and transparent voting procedures. The project consists of two contracts: **BallotManager** and **Ballot**. 
 
-The project has two contracts named BallotManager and Ballot. The BallotManager mainly handles several instances of the Ballot contracts through a mapping. Each Ballot created is associated with a Ballot ID which maps to a Ballot Contract.
+- **BallotManager**: Manages multiple instances of the Ballot contract using a mapping.
+- **Ballot**: Represents a single voting session, where proposals are presented, and voters can vote for their preferred options.
 
-The project has two users:
-1. Chairperson: This is a user with special privileges (similar to a super-user.)
-2. Voters
+### Users and Roles:
+- **Chairperson**: A user with special privileges who can create ballots, manage voter rights, and view voter information.
+- **Voters**: Users who can vote on proposals or delegate their vote to other voters.
 
-Role of Chairperson: The Chairperson has the authority to create a ballot by entering the Proposal Names and duration for the ballot. Additionally, the chairperson can grant or revoke voting rights to voters. The Chairperson can see voters information such as vote status, delegate address and many more.
-Role of Voters: Voters can choose to vote for a particular proposal of their choice. Voters may also choose to delegate their vote to another voters (who also must have voting rights.) The chairperson is given voting rights to every ballot.
+### Voting System:
+- **Ballot Winner**: The proposal with the most votes wins. In case of a tie, a **keccak256** function is used to randomly select a winner.
 
-The Ballot Winner is decided by the proposal that gets the most votes. In the event of a tie, the project uses keccak256 function which generates a pseudo random number that is used to randomly pick a winner.
-
-##Solidity Version
+## Solidity Version
 **0.8.14**
 
-##Requirements
-**1.Access to a Cryptocurrency Wallet such as Metamask. You can add this as an extension to a browser such as Chrome, Firefox or Edge.**
-**2.Access to personal Etherum blockchain such as Ganache.**
-**3.Numpy installed.**
-**4.Truffle installed.**
+## Requirements
+- Access to a Cryptocurrency Wallet (e.g., **MetaMask**)
+- Access to a personal Ethereum blockchain (e.g., **Ganache**)
+- **Numpy** installed
+- **Truffle** installed
 
-##Instructions
-**1.Launch Ganache.** Head to the account area and import atleast 3 accounts onto your Metamask wallet.
-**2.Download the project** and place it in a directory of your choice.
-**3.Ganache Workspace:** Create Ganache Workspace named "SmartVote". Add a project to this workspace by navigating to the project directory and choosing the truffle-config.js file found in this project.
-**4.Create public directory** in the project directory.
-**5.Truffle Compile:** Open Command Line and navigate to the directory where the project is located and type "truffle migrate".
-**6.Launch http-server.** Launch the http-server to serve the project directory. Once the http-server is listening to requests, head over to the browser and enter http://127.0.0.1:8080/index.html to open the welcome page.
+## Instructions
 
-##Licensing
-This Project is Licensed under the GNU GENERAL PUBLIC LICENSE.
+1. **Launch Ganache**: Open Ganache and import at least 3 accounts into your MetaMask wallet.
+2. **Download Project**: Download the project and place it in a directory of your choice.
+3. **Ganache Workspace**: Create a workspace named "SmartVote" in Ganache and add the project by selecting `truffle-config.js`.
+4. **Create Public Directory**: Create a `public` directory in your project folder.
+5. **Truffle Compile**: Open the command line, navigate to the project directory, and run `truffle migrate` to deploy the contracts.
+6. **Launch HTTP Server**: Start an HTTP server to serve the project directory. Once running, open the browser and navigate to `http://127.0.0.1:8080/index.html` to access the welcome page.
 
-##Features
-- **Automatic Detection of Chairperson address: **
-  - The project is designed to detect the Chairperson address from Ganache. The first account in Ganache is assigned the Chairperson role. This avoids the need to hardcode chairperson address each time.
+## Licensing
+This project is licensed under the **GNU GENERAL PUBLIC LICENSE**.
 
-- **Automatic fetch of BallotManager address: **
-  - The project is designed to detect the address of the BallotManager Contract and store the information in a json file which makes it easy to operate. This avoids the need to update HTML files each time a new deployment is performed.
+## Features
 
-- **Voting Rights Management**:
-  - The **chairperson** can grant and revoke voting rights to specific addresses.
-  - Voters can only be granted voting rights if they haven't voted already.
-  
-- **Delegated Voting**:
-  - Voters can delegate their vote to another voter, allowing indirect voting.
-  - Delegation is limited to a maximum depth of 3 to prevent excessive delegation.
-  - If a delegate has already voted, the sender's weight is added to the proposal the delegate voted for. Otherwise, the delegate's voting weight increases.
+- **Automatic Detection of Chairperson**: The first account in Ganache is automatically assigned the Chairperson role.
+- **BallotManager Address Detection**: The BallotManager contract address is automatically fetched and stored in a JSON file, avoiding the need to update HTML files after each deployment.
+- **Voting Rights Management**: The Chairperson can grant/revoke voting rights. Voters can only vote if they have not voted already.
+- **Delegated Voting**: Voters can delegate their vote to another voter (maximum delegation depth of 3).
+- **Vote Casting**: Voters can cast their vote for one of the available proposals, provided they have voting rights.
+- **Proposal Management**: Proposals can be added at contract deployment, and a `getProposals()` function lists all available proposals.
+- **Voting Deadline Enforcement**: Voting ends after a set duration, and the `hasNotEnded` modifier ensures no voting or delegation is allowed after the deadline.
+- **Winner Calculation**: The proposal with the most votes wins. In case of a tie, a random selection is made using **keccak256**.
+- **Voter Information**: View voter details, including voting status and vote delegation.
+- **Time Remaining**: The `remainingTime()` function displays the time left until voting ends.
+- **Flexible Voting Weight**: The Chairperson can adjust a voter’s weight (except to zero).
+- **Ballot Creation**: The Chairperson can create new ballots with a list of proposals and a voting duration.
+- **Ballot Management**: All ballots are tracked using a mapping (`ballotToContract`), with a `getBallotAddress()` function to retrieve specific ballot addresses.
+- **Retrieve All Ballots**: A function that returns a list of all ballot IDs and their associated addresses.
+- **SmartVote Welcome Page**: The homepage introduces the SmartVote Voting System with a logo and tagline.
 
-- **Vote Casting**:
-  - Each voter can cast a vote for one of the available proposals, provided they have voting rights and haven't voted already.
-  
-- **Proposal Management**:
-  - Proposals can be created during contract deployment. Each proposal has a name and a vote count.
-  - The contract provides the function `getProposals()` to list all proposal names.
+### Delegate Rules:
+- Only voters with voting rights can delegate.
+- Self-delegation is not allowed.
+- Delegation is limited to 3 levels to prevent excessive delegation.
 
-- **Voting Deadline Enforcement**:
-  - Voting has a set deadline, which is established during contract deployment.
-  - The `hasNotEnded` modifier ensures that voting and delegation are not allowed after the voting period ends.
+### Ballot Management:
+- Users can load and view ballots, displaying ballot IDs and addresses dynamically.
 
-- **Winner Calculation**:
-  - The contract calculates the winning proposal based on the number of votes.
-  - In the event of a tie, the contract randomly selects a winner from the tied proposals.
-  - The function `winnerName()` returns the name of the winning proposal along with vote counts for all proposals.
+### Smart Contract Integration:
+- The page interacts with the **BallotManager** smart contract using **Web3.js**, fetching the contract address from a JSON file.
 
-- **Voter Information**:
-  - The contract allows viewing of all voters' information, including their voting status (whether they've voted), their voting rights, and the address to which their vote is delegated.
-  
-- **Time Remaining**:
-  - The `remainingTime()` function provides the time left until the voting period ends, in seconds.
+### MetaMask Integration:
+- The page connects to the Ethereum network using MetaMask, with a fallback to a local provider (e.g., Ganache) if MetaMask is not detected.
 
-- **Flexible Voting Weight Management**:
-  - The chairperson can adjust a voter's weight (excluding setting it to zero), enabling flexible control over the influence of voters.
+## Front End Instructions
 
-- **Ballot Creation**:
-  - The **chairperson** can create new ballots by specifying a list of proposal names and the voting duration (in seconds).
-  - Each new ballot is deployed as a separate `Ballot` contract, and the address of each ballot is stored for future reference.
-  - The `createBallot()` function increases the `ballotCount` and maps the ballot ID to the newly created ballot contract.
+### Voter.html
 
-- **Ballot Management**:
-  - The contract keeps track of all deployed ballots using a mapping (`ballotToContract`), where each ballot ID maps to a specific ballot contract address.
-  - The `getBallotAddress()` function allows users to query the address of a specific ballot by its ID.
+1. **Ballot ID Input**:
+   - Input field for users to specify the Ballot ID to vote on.
+   - Clicking "Load Ballot" fetches the contract address for the specified Ballot.
 
-- **Retrieve All Ballots**:
-  - The contract allows retrieving a list of all ballots, including their IDs and addresses, through the `getAllBallots()` function. This function returns two arrays:
-    - An array of ballot IDs.
-    - An array of corresponding ballot contract addresses.
+2. **Voting Section**:
+   - Displays available proposals and allows users to vote by clicking the vote button.
+   - The vote is recorded on the blockchain.
 
-- **Chairperson Role**:
-  - Only the **chairperson** can create new ballots, ensuring that ballot creation is restricted to an authorized address.
-  - The chairperson is set during contract deployment and is required to interact with certain functions like creating ballots.
-  
-- **SmartVote Welcome Page**:
-  - The homepage introduces the **SmartVote Voting System**, highlighting its purpose and security focus.
-  - The header includes the **SmartVote logo** and a tagline: "Secure Your Vote, Secure Your Future."
-  
-- **Delegate Rules**:
-  - Detailed rules explain the eligibility for **delegating votes**:
-    - Only voters with voting rights can delegate.
-    - Self-delegation is disallowed.
-    - Delegation depth is limited to 3 levels.
-    - Delegation loops are prevented.
-    - Delegates must have voting rights.
-    - Voters who delegate cannot vote again.
+3. **Delegate Vote**:
+   - Allows voters to delegate their vote to another valid voter address.
 
-- **Ballot Management**:
-  - Users can view all available ballots by clicking the "Load All Ballots" button.
-  - A table is dynamically populated with **ballot IDs** and **ballot addresses** when the data is loaded from the blockchain.
+4. **Remaining Time Section**:
+   - Displays the remaining time for voting (in hours, minutes, seconds).
 
-- **Navigation Links**:
-  - Links to navigate to different pages of the platform:
-    - **Ballot page** for managing ballots.
-    - **Voter page** for managing individual voter information.
+5. **Loading Indicators**:
+   - Shows a loading message and spinner while fetching data or processing transactions.
 
-- **Smart Contract Integration**:
-  - The page interacts with the **BallotManager smart contract** using **Web3.js** to load all ballots from the blockchain.
-  - The contract's address is dynamically fetched from a **JSON file** (`contract_address.json`), with fallback options for local development environments.
+6. **Smart Contract Interaction**:
+   - Uses **Web3.js** to interact with **BallotManager** and individual ballots.
 
-- **MetaMask Integration**:
-  - The page checks for the presence of **MetaMask** to connect to the Ethereum network. If MetaMask is not detected, a fallback to a local provider (e.g., Ganache) is used for testing and development.
-  
-##Front End Instructions
+7. **MetaMask and Ethereum Network Integration**:
+   - Ensures MetaMask is available for Ethereum connection.
 
-#Voter.html
+8. **Error Handling**:
+   - Alerts users about errors like invalid inputs or transaction failures.
 
-- **Ballot ID Input**:
-  - A field for users to input the **Ballot ID** to fetch the specific ballot they want to vote on.
-  - **Load Ballot Button**: Fetches the active ballot contract address using the **BallotManager** smart contract.
-  - Displays an alert if no ballot is found for the given ID.
+9. **UI Elements**:
+   - Organized into cards for a user-friendly interface.
 
-- **Voting Section**:
-  - Displays a list of proposals under the active ballot.
-  - Users can vote for their preferred proposal by clicking a dynamically generated **vote button**.
-  - The **vote** function interacts with the blockchain to register the user's vote for the selected proposal.
+10. **Dynamic Content Loading**:
+    - Updates dynamic elements like proposals and remaining time based on blockchain data.
 
-- **Delegate Vote**:
-  - Allows voters to **delegate their vote** to another Ethereum address.
-  - Users input the address they want to delegate to and click **Delegate Vote** to trigger the delegation transaction.
-  - The system checks if the entered address is valid before sending the delegation request.
+### Ballot.html
 
-- **Remaining Time Section**:
-  - Displays the **remaining voting time** in a formatted string (hours, minutes, and seconds).
-  - Users can click **Check Remaining Time** to load the remaining time from the ballot contract.
-  - The **remainingTime()** function fetches the time left for voting from the smart contract.
+1. **Header Section**:
+   - Displays the logo and page title. Includes a link back to the homepage.
 
-- **Loading Indicators**:
-  - Displays a **loading message** and a **spinner** while the system is fetching data or processing transactions, providing feedback to users during these operations.
+2. **Create Ballot Section**:
+   - Form to create new ballots with proposals and duration.
 
-- **Smart Contract Interaction**:
-  - Uses **Web3.js** to interact with the **BallotManager smart contract** and individual ballot contracts.
-  - Fetches the **contract address** from a **JSON file** (`contract_address.json`) for dynamic loading of contracts.
-  - Allows voting and delegation via smart contract calls to **vote()** and **delegate()** functions.
+3. **Load Ballot Section**:
+   - Input field for Ballot ID, fetching the associated ballot contract.
 
-- **MetaMask and Ethereum Network Integration**:
-  - The page checks if **MetaMask** is installed to connect to the Ethereum network.
-  - If **MetaMask** is not available, a fallback to a **local Ethereum provider** (e.g., Ganache) is used for development and testing.
+4. **Grant Voting Rights Section**:
+   - Allows granting voting rights to specified Ethereum addresses.
 
-- **Error Handling**:
-  - Alerts users if there are issues with input validation, smart contract interactions, or loading data (e.g., invalid ballot ID, network errors, invalid addresses).
-  - Detailed error messages are logged in the console for debugging.
+5. **Revoke Voting Rights Section**:
+   - Allows revoking voting rights from specified addresses.
 
-- **UI Elements**:
-  - **Header** with the platform's logo and navigation options (e.g., Home link).
-  - **Cards** organize sections like ballot input, voting, and delegate vote functionality for a clean and user-friendly interface.
-  - **Footer** contains copyright information.
+6. **Adjust Voter Weight Section**:
+   - Modify a voter's weight by providing their address and new weight.
 
-- **Dynamic Content Loading**:
-  - All dynamic elements (e.g., proposals, remaining time) are fetched from the smart contract and updated in real-time based on the blockchain data.
+7. **Declare Winner Section**:
+   - Table to display the winner and their vote counts.
 
-#Ballot.html
+8. **Voting Time Remaining Section**:
+   - Shows the remaining time until the voting deadline.
 
-- **Header Section**:
-  - Contains the platform's logo and title, **SmartVote Voting System**, at the top.
-  - A **Home link** navigates users back to the main page.
-  - The page displays the title **Ballot Page**, indicating the specific section.
+9. **Voter Information Section**:
+   - Displays details about voters, including those with and without voting rights.
 
-- **Create Ballot Section**:
-  - Form to **create a new ballot**:
-    - **Proposal Names**: Input field to enter the list of proposal names (comma separated).
-    - **Voting Duration**: Input field for specifying the voting duration in seconds.
-    - **Create Ballot Button**: Triggers the creation of a new ballot via the smart contract, using the entered data.
-  
-- **Load Ballot Section**:
-  - **Ballot ID Input**: Input field where the user can enter a **Ballot ID** to load the associated ballot contract.
-  - **Load Ballot Button**: Fetches the ballot contract address from the **BallotManager smart contract** and sets the ballot contract for further interactions.
+10. **Footer Section**:
+    - Contains copyright information.
 
-- **Grant Voting Rights Section**:
-  - **Voters List Input**: Text area to input Ethereum addresses (comma separated) for which voting rights will be granted.
-  - **Grant Voting Rights Button**: Executes the granting of voting rights via the smart contract.
+11. **Smart Contract Interaction**:
+    - Uses **Web3.js** to interact with **BallotManager** and manage ballots.
 
-- **Revoke Voting Rights Section**:
-  - **Revoke Voters List Input**: Text area for entering addresses (comma separated) to revoke voting rights.
-  - **Revoke Voting Rights Button**: Triggers the revocation of voting rights via the smart contract.
-
-- **Adjust Voter Weight Section**:
-  - **Voter Address Input**: Field to input a specific voter's address.
-  - **New Weight Input**: Field to enter a new weight for the specified voter.
-  - **Adjust Weight Button**: Updates the voter’s weight by interacting with the smart contract.
-
-- **Declare Winner Section**:
-  - A table to display **winning proposal names** and their respective vote counts.
-  - **Get Winner Button**: Triggers the retrieval of the winning proposal name and updates the table with the proposal names and vote counts.
-
-- **Voting Time Remaining Section**:
-  - A paragraph that initially shows "Click to load remaining time...".
-  - **Check Remaining Time Button**: Fetches and displays the **remaining voting time** in hours, minutes, and seconds from the ballot contract.
-
-- **Voter Information Section**:
-  - A button that triggers fetching of voter information from the **ballot contract** to display details about voters.
-
-- **Voters with Voting Rights Section**:
-  - A table to display voters who currently have **voting rights**, showing their addresses, status, eligibility, and delegate addresses.
-
-- **Voters with Revoked Rights Section**:
-  - A table to display voters who have had their **voting rights revoked**, showing only their addresses.
-
-- **Footer Section**:
-  - Contains a copyright message for the voting system.
-
-- **Smart Contract Interaction**:
-  - Uses **Web3.js** to interact with the **BallotManager** smart contract.
-  - Fetches the **contract address** dynamically from a `contract_address.json` file.
-  - Retrieves and sets the **ballot contract address** based on the provided ballot ID.
-
-- **MetaMask Integration**:
-  - The page checks for **MetaMask** to connect to the Ethereum network. If MetaMask is not detected, it falls back to a **local Ethereum provider** (e.g., Ganache) for development.
-
-- **Ballot Creation**:
-  - The **createBallot()** function interacts with the **BallotManager smart contract** to create a new ballot using the provided proposals and duration.
-  - The **proposal names** are converted into `bytes32` format for use in the smart contract.
-
-- **Voting Rights Management**:
-  - The page allows the **chairperson** to grant and revoke voting rights for specific Ethereum addresses using **grantVotingRights()** and **revokeVotingRights()** functions.
-  - The **adjustVoterWeight()** function allows the chairperson to modify the weight of a specific voter’s vote.
-
-- **Winner Declaration**:
-  - The **getWinnerName()** function retrieves the winning proposal’s name and vote counts, and populates a table with the results.
-
-- **Remaining Time**:
-  - The **updateRemainingTime()** function fetches the remaining voting time from the ballot contract and displays it in a human-readable format.
-
-- **Voter Information**:
-  - The **getVotersInfo()** function displays a list of voters, categorized by those with voting rights and those with revoked rights, in their respective tables.
-
-- **Error Handling**:
-  - Alerts and **console errors** are shown if there are issues such as invalid input, network errors, or issues with fetching data or interacting with the smart contract.
+12. **Error Handling**:
+    - Provides error messages for invalid inputs and contract interaction failures.
