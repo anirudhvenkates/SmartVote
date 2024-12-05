@@ -1,0 +1,262 @@
+/* General Reset and Body Style */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  /*background-color: #add8e6; Light blue background for the body */
+  background-color: #d8d0c2;
+  color: #333;
+  padding: 20px;
+}
+
+/* Heading Styles */
+h1, h2, h3 {
+  color: #800020;
+  margin-bottom: 15px;
+}
+
+/* Header Styles */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+header .logo-container {
+  display: flex;
+  align-items: center;
+}
+
+header .logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+header a.home-link {
+  font-size: 18px;
+  color: #333333;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+header a.home-link i {
+  margin-right: 5px;
+}
+
+header h1 {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+}
+
+/* Main Content Section */
+.voter-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Individual Card Styles */
+.card {
+  background-color: #fff;  /* White background for each card */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;  /* Space between each card */
+}
+
+/* Card Heading */
+.card h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #0047ab;
+}
+
+/* Form Elements inside Cards */
+.card input, .card textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.card button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.card button:hover {
+  background-color: #45a049;
+}
+
+/* Proposals Section */
+#proposals-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#proposals-container button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-size: 16px;
+  margin: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+#proposals-container button:hover {
+  background-color: #1e88e5;
+}
+
+/* Remaining Time Section */
+#remainingTime {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Footer Style */
+footer {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+footer p {
+  margin-top: 15px;
+  color: #000;
+}
+
+/* Icon Alignment */
+section i {
+  margin-right: 8px;
+}
+
+/* Loading Message and Spinner */
+#loadingMessage {
+  text-align: center;
+  font-size: 18px;
+  color: #4CAF50;
+  display: none;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #4CAF50;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+  .voter-content {
+    padding: 10px;
+  }
+
+  .card {
+    width: 100%;  /* Full width on small screens */
+  }
+
+  /* Adjust button sizes and text in proposals section */
+  #proposals-container button {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+/* Card Styling for better structure */
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 15px 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+/* Styling for the buttons */
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Text Area Styling */
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    margin-bottom: 10px;
+}

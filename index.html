@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to SmartVote</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script src="ballot_abi.js"></script>
+    <link rel="stylesheet" href="index_styles.css">
+    <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+			<div class="logo-container">
+            <img src="logo.svg" alt="SmartVote Logo" class="logo">
+			</div>
+            <h1>Welcome to SmartVote Voting System</h1>
+            <p>Secure Your Vote, Secure Your Future</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="main-content">
+            <div class="instructions-card">
+                <h2>Instructions for Chairpersons:</h2>
+                <ul>
+                    <li>Create ballots with proposals and voting duration.</li>
+                    <li>Grant or revoke voting rights by entering user addresses.</li>
+                    <li>Adjust voter weights based on their address and new weight.</li>
+                    <li>View winner names and vote counts for each proposal.</li>
+                    <li>View voter information, including those with revoked rights.</li>
+                </ul>
+            </div>
+
+            <div class="instructions-card">
+                <h2>Instructions for Voters:</h2>
+                <ul>
+                    <li>Fetch the ballot ID before voting.</li>
+                    <li>The ballot options will automatically populate once the ballot is loaded.</li>
+                    <li>Delegate votes to other eligible voters if necessary. Refer to Delegate Rules below.</li>
+                </ul>
+            </div>
+
+            <div class="delegate-rules-card">
+                <h2>Delegate Rules:</h2>
+                <h3>Eligibility to Delegate:</h3>
+                <ul>
+                    <li>Voters can delegate their vote only if they have voting rights.</li>
+                    <li>The voter cannot have already voted.</li>
+                </ul>
+                <h3>Self-Delegation is Disallowed:</h3>
+                <ul>
+                    <li>Voters cannot delegate votes to themselves.</li>
+                </ul>
+                <h3>Maximum Delegation Depth:</h3>
+                <ul>
+                    <li>The delegation chain is limited to 3 levels deep.</li>
+                </ul>
+                <h3>Delegation Loop Prevention:</h3>
+                <ul>
+                    <li>Delegation loops are prevented (i.e., creating a cycle in delegation).</li>
+                </ul>
+                <h3>Delegate Must Have Voting Rights:</h3>
+                <ul>
+                    <li>Delegates must have voting rights (weight greater than zero).</li>
+                </ul>
+                <h3>No Double Voting:</h3>
+                <ul>
+                    <li>A voter who has delegated their vote cannot vote themselves after delegation.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Ballots List Section -->
+        <section class="ballots-section">
+            <div class="ballots-card">
+                <h2>All Ballots</h2>
+                <button onclick="loadAllBallots()" class="btn-primary">Load All Ballots</button>
+            </div>
+
+            <div class="ballots-card">
+                <h2>Ballots List</h2>
+                <table id="ballotsList">
+                    <thead>
+                        <tr>
+                            <th>Ballot ID</th>
+                            <th>Ballot Address</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="home-links">
+            <a href="ballot.html" class="btn">Go to Ballot</a>
+            <a href="voter.html" class="btn">Go to Voter Page</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Voting System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const web3 = new Web3(Web3.givenProvider || "http://localhost:7545"); // Connect to Ganache
+        const ballotManagerAddress = "0xb79344eeFdC8F49A15E90B2c45a6FebD0Ff533e7"; // Replace with BallotManager contract address
+        const ballotManagerContract = new web3.eth.Contract(ballotManagerABI, ballotManagerAddress);
+
+        async function loadAllBallots() {
+            try {
+                const result = await ballotManagerContract.methods.getAllBallots().call();
+                const ballotIds = result[0];      // Array of ballot IDs
+                const ballotAddresses = result[1]; // Array of ballot addresses
+				console.log(ballotAddresses);
+
+                const tableBody = document.getElementById("ballotsList").getElementsByTagName("tbody")[0];
+                tableBody.innerHTML = '';
+
+                for (let i = 1; i < ballotIds.length; i++) {
+                    const row = document.createElement("tr");
+
+                    const ballotIdCell = document.createElement("td");
+                    ballotIdCell.innerText = ballotIds[i];
+                    row.appendChild(ballotIdCell);
+
+                    const ballotAddressCell = document.createElement("td");
+                    ballotAddressCell.innerText = ballotAddresses[i];
+                    row.appendChild(ballotAddressCell);
+
+                    tableBody.appendChild(row);
+                }
+            } catch (error) {
+                console.error("Error loading ballots: ", error);
+                alert("There was an error loading the ballots.");
+            }
+        }
+    </script>
+</body>
+</html>
