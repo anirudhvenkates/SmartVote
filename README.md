@@ -135,11 +135,64 @@ This project is licensed under the **GNU GENERAL PUBLIC LICENSE**.
 9. **Voter Information Section**:
    - Displays details about voters, including those with and without voting rights.
 
-10. **Footer Section**:
-    - Contains copyright information.
-
-11. **Smart Contract Interaction**:
+10. **Smart Contract Interaction**:
     - Uses **Web3.js** to interact with **BallotManager** and manage ballots.
 
-12. **Error Handling**:
+11. **Error Handling**:
     - Provides error messages for invalid inputs and contract interaction failures.
+
+## Index.html
+
+1. **Web3 Integration**:
+	- Connects to the Ethereum network via Web3.js, either through MetaMask or a local Ethereum provider (like Ganache) for development.
+	- Loads the BallotManager contract dynamically using Web3.js from a provided contract address (contract_address.json).
+
+2. **User-Friendly Layout**:
+	- Clean and intuitive layout with sections for both Chairpersons and Voters, explaining their specific roles and instructions.
+	- Clearly structured sections that guide the user on how to interact with the voting platform.
+
+3. **Instructions for Chairpersons**:
+	- Provides a clear list of tasks for chairpersons, such as:
+		- Creating ballots
+		- Granting/revoking voting rights
+		- Adjusting voter weights
+		- Viewing the vote results
+		- Instructions for Voters:
+		- Guides voters on how to:
+		- Fetch ballot IDs
+		- Vote for proposals
+		- Delegate their vote to other eligible voters
+		- Also includes important rules related to vote delegation.
+
+4. **Delegate Rules**:
+	- Outlines the rules for vote delegation:
+		- Voters can delegate their vote only if they have voting rights and have not already voted.
+		- Voters cannot delegate votes to themselves.
+		- Delegation depth is limited to 3 levels, preventing loops and ensuring that delegates have voting rights.
+
+5. **Ballot Management**:
+	- The Ballots List section displays a table of all active ballots, including their IDs and addresses, which can be loaded dynamically from the blockchain.
+	- A Load All Ballots button fetches the list of ballots and populates the table.
+
+6. **Navigation Links**:
+	- Provides easy navigation to other parts of the platform:
+		- Ballot Page for creating and managing ballots.
+		- Voter Page for interacting with individual voters and their votes.
+
+7. **MetaMask Detection and Fallback**:
+	- Automatically detects if MetaMask is installed in the user's browser.
+	- If MetaMask is not detected, the page falls back to a local Ethereum provider (such as Ganache) for development purposes.
+	
+8. **Smart Contract Interaction**:
+	- Uses the BallotManager smart contract to load and manage ballots.
+	- Fetches ballot data and populates the page dynamically using Web3.js.
+
+9. **Dynamic Content Loading**:
+	- Loads ballot data (IDs and addresses) dynamically and displays it in a table. This allows users to interact with all available ballots without needing to reload the page.
+
+10. **Responsive Design**:
+	- Designed to be mobile-friendly with a responsive layout for better viewing and interaction on different devices.
+
+11. **Error Handling**:
+	- Displays error messages if there are issues while loading the contract address or fetching ballot data.
+	- Alerts the user in case of errors during interactions, improving user experience by providing feedback during operations.
