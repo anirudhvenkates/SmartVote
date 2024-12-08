@@ -50,16 +50,28 @@ contract Ballot {
     }
 
     // Function to give voting rights to multiple voters
-    function giveVotingRights(address[] calldata votersList) external onlyChairperson {
-        for (uint i = 0; i < votersList.length; i++) {
-            address voter = votersList[i];
-            require(!voters[voter].voted, "The voter already voted.");
-            require(voters[voter].weight == 0, "The voter already has voting rights.");
-            
-            voters[voter].weight = 1;
-            voterAddresses.push(voter);
-        }
-    }
+	function giveVotingRights(address[] calldata votersList) external onlyChairperson {
+		for (uint i = 0; i < votersList.length; i++) {
+			address voter = votersList[i];
+			require(!voters[voter].voted, "The voter already voted.");
+			require(voters[voter].weight == 0, "The voter already has voting rights.");
+			
+			// Ensure the voter is not already in the voterAddresses list
+			bool isVoterAlreadyAdded = false;
+			for (uint j = 0; j < voterAddresses.length; j++) {
+				if (voterAddresses[j] == voter) {
+					isVoterAlreadyAdded = true;
+					break;
+				}
+			}
+			
+			if (!isVoterAlreadyAdded) {
+				voterAddresses.push(voter);
+			}
+
+			voters[voter].weight = 1;
+		}
+	}
 
     // Function to revoke voting rights from multiple voters
     function revokeVotingRights(address[] calldata votersList) external onlyChairperson {

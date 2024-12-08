@@ -17,33 +17,48 @@ var ballotABI = [
         "type": "address"
       }
     ],
+    "name": "constructor",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "chairperson",
+    "outputs": [
       {
-        "internalType": "address[]",
-        "name": "votersList",
-        "type": "address[]"
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
-    "name": "giveVotingRights",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "deadline",
+    "outputs": [
       {
-        "internalType": "address[]",
-        "name": "votersList",
-        "type": "address[]"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
-    "name": "revokeVotingRights",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_DELEGATION_DEPTH",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -70,25 +85,6 @@ var ballotABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "addr",
-        "type": "address"
-      }
-    ],
-    "name": "toString",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -149,25 +145,6 @@ var ballotABI = [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "_bytes32",
-        "type": "bytes32"
-      }
-    ],
-    "name": "bytes32ToString",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "winnerName",
     "outputs": [
@@ -204,6 +181,85 @@ var ballotABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "votersList",
+        "type": "address[]"
+      }
+    ],
+    "name": "giveVotingRights",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "votersList",
+        "type": "address[]"
+      }
+    ],
+    "name": "revokeVotingRights",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_bytes32",
+        "type": "bytes32"
+      }
+    ],
+    "name": "bytes32ToString",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "toString",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  }
+]
+var ballotManagerABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_chairperson",
+        "type": "address"
+      }
+    ],
+    "name": "constructor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "inputs": [],
     "name": "chairperson",
     "outputs": [
@@ -211,45 +267,6 @@ var ballotABI = [
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "deadline",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "MAX_DELEGATION_DEPTH",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "voterAddresses",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -258,82 +275,19 @@ var ballotABI = [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "voter",
-        "type": "address"
-      }
-    ],
-    "name": "voters",
-    "outputs": [
+        "internalType": "bytes32[]",
+        "name": "proposalNames",
+        "type": "bytes32[]"
+      },
       {
-        "internalType": "struct Ballot.Voter",
-        "name": "",
-        "type": "tuple",
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "weight",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "voted",
-            "type": "bool"
-          },
-          {
-            "internalType": "address",
-            "name": "delegate",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "vote",
-            "type": "uint256"
-          }
-        ]
+        "internalType": "uint256",
+        "name": "votingDurationInSeconds",
+        "type": "uint256"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "proposals",
-    "outputs": [
-      {
-        "internalType": "struct Ballot.Proposal[]",
-        "name": "",
-        "type": "tuple[]",
-        "components": [
-          {
-            "internalType": "bytes32",
-            "name": "name",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "uint256",
-            "name": "voteCount",
-            "type": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-]
-var ballotManagerABI = [
-  {
-    "inputs": [],
-    "name": "chairperson",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "createBallot",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -376,19 +330,20 @@ var ballotManagerABI = [
   {
     "inputs": [
       {
-        "internalType": "bytes32[]",
-        "name": "proposalNames",
-        "type": "bytes32[]"
-      },
-      {
         "internalType": "uint256",
-        "name": "votingDurationInSeconds",
+        "name": "ballotId",
         "type": "uint256"
       }
     ],
-    "name": "createBallot",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "ballotToContract",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
