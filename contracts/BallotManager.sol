@@ -13,8 +13,8 @@ contract BallotManager {
         _;
     }
 
-    constructor() {
-        chairperson = 0x87E78674B86E64f1a4cA0B55D40EEC692C5a367f;
+    constructor(address _chairperson) {
+        chairperson = _chairperson;
     }
 
     // Function to create a new ballot

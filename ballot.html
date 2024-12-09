@@ -132,7 +132,6 @@
 
     <script>
       let ballotContract;
-	  let ballotID=0;
 	  let ballotManagerContract;
 	  let web3;
 	  
@@ -217,9 +216,7 @@
 			const receipt = await ballotManagerContract.methods.createBallot(proposalNamesBytes32, votingDurationInSeconds).send({ from: chairpersonAddress });
 			console.log(receipt);
 			
-			// Listen for the BallotCreated event
-			ballotID = ballotID + 1; 
-			alert(`New ballot created with Ballot ID: ${ballotID}`);
+			alert("New Ballot created!");
 		  } catch (error) {
 			console.error("Error creating ballot:", error);
 			alert("There was an error creating the ballot.");
